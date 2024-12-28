@@ -1,3 +1,4 @@
+import React, { useState, useEffect } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import * as XLSX from 'xlsx'
@@ -7,11 +8,11 @@ interface FilePreviewProps {
 }
 
 export function FilePreview({ file }: FilePreviewProps) {
-  const [data, setData] = React.useState<any[]>([])
-  const [headers, setHeaders] = React.useState<string[]>([])
-  const [loading, setLoading] = React.useState(true)
+  const [data, setData] = useState<any[]>([])
+  const [headers, setHeaders] = useState<string[]>([])
+  const [loading, setLoading] = useState(true)
 
-  React.useEffect(() => {
+  useEffect(() => {
     const readFile = async () => {
       try {
         const fileContent = await file.arrayBuffer()
