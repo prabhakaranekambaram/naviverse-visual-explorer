@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
 import * as XLSX from 'xlsx'
 
 interface FilePreviewProps {
   file: File;
+  onSave: (file: File) => void;
+  onCancel: () => void;
 }
 
-export function FilePreview({ file }: FilePreviewProps) {
+export function FilePreview({ file, onSave, onCancel }: FilePreviewProps) {
   const [data, setData] = useState<any[]>([])
   const [headers, setHeaders] = useState<string[]>([])
   const [loading, setLoading] = useState(true)
@@ -72,6 +75,14 @@ export function FilePreview({ file }: FilePreviewProps) {
               ))}
             </TableBody>
           </Table>
+        </div>
+        <div className="flex justify-end gap-4 mt-4">
+          <Button variant="outline" onClick={onCancel}>
+            Cancel
+          </Button>
+          <Button onClick={() => onSave(file)}>
+            Save
+          </Button>
         </div>
       </CardContent>
     </Card>

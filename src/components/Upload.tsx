@@ -8,6 +8,7 @@ import { FilePreview } from "./FilePreview"
 
 export function Upload() {
   const [files, setFiles] = useState<File[]>([])
+  const [savedFiles, setSavedFiles] = useState<File[]>([])
   const [dragActive, setDragActive] = useState(false)
   const [uploadProgress, setUploadProgress] = useState(0)
   const { toast } = useToast()
@@ -61,6 +62,23 @@ export function Upload() {
 
   const removeFile = (index: number) => {
     setFiles(prev => prev.filter((_, i) => i !== index))
+  }
+
+  const handleSaveFile = (file: File) => {
+    setSavedFiles(prev => [...prev, file])
+    setFiles(prev => prev.filter(f => f !== file))
+    toast({
+      title: "File Saved",
+      description: `${file.name} has been saved successfully`
+    })
+  }
+
+  const handleCancelFile = () => {
+    setFiles([])
+    toast({
+      title: "Upload Cancelled",
+      description: "File upload has been cancelled"
+    })
   }
 
   const uploadFiles = async () => {
@@ -126,7 +144,11 @@ export function Upload() {
                   <X className="h-4 w-4" />
                 </Button>
               </Alert>
-              <FilePreview file={file} />
+              <FilePreview 
+                file={file} 
+                onSave={handleSaveFile}
+                onCancel={handleCancelFile}
+              />
             </div>
           ))}
           
@@ -141,6 +163,24 @@ export function Upload() {
           >
             Upload {files.length} file{files.length > 1 ? 's' : ''}
           </Button>
+        </div>
+      )}
+
+      {savedFiles.length > 0 && (
+        <div className="mt-8">
+          <h3 className="text-lg font-semibold mb-4">Saved Files</h3>
+          <div className="space-y-2">
+            {savedFiles.map((file, index) => (
+              <Alert key={index}>
+                <div className="flex items-center gap-2">
+                  <File className="h-4 w-4" />
+                  <AlertDescription>
+                    {file.name} ({(file.size / 1024).toFixed(2)} KB)
+                  </AlertDescription>
+                </div>
+              </Alert>
+            ))}
+          </div>
         </div>
       )}
     </div>
