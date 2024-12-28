@@ -4,6 +4,7 @@ import { useToast } from "@/components/ui/use-toast"
 import { Progress } from "@/components/ui/progress"
 import { Button } from "@/components/ui/button"
 import { Alert, AlertDescription } from "@/components/ui/alert"
+import { FilePreview } from "./FilePreview"
 
 export function Upload() {
   const [files, setFiles] = useState<File[]>([])
@@ -109,21 +110,24 @@ export function Upload() {
       {files.length > 0 && (
         <div className="space-y-4">
           {files.map((file, index) => (
-            <Alert key={index} className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <File className="h-4 w-4" />
-                <AlertDescription>
-                  {file.name} ({(file.size / 1024).toFixed(2)} KB)
-                </AlertDescription>
-              </div>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => removeFile(index)}
-              >
-                <X className="h-4 w-4" />
-              </Button>
-            </Alert>
+            <div key={index}>
+              <Alert className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <File className="h-4 w-4" />
+                  <AlertDescription>
+                    {file.name} ({(file.size / 1024).toFixed(2)} KB)
+                  </AlertDescription>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => removeFile(index)}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </Alert>
+              <FilePreview file={file} />
+            </div>
           ))}
           
           {uploadProgress > 0 && (
