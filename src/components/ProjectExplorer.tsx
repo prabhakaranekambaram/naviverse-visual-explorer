@@ -1,4 +1,4 @@
-import { ChevronRight, ChevronDown, Folder, Upload, Database, Box, Plus, FileUp } from "lucide-react"
+import { ChevronRight, ChevronDown, Folder, Upload, Database, Box, Plus, FileUp, FileText, Filter, ChartLine } from "lucide-react"
 import { useState, useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { useToast } from "@/components/ui/use-toast"
@@ -121,7 +121,21 @@ export function ProjectExplorer() {
         <TreeItem 
           label="Model Generator" 
           icon={<Box className="w-4 h-4" />}
-        />
+          defaultExpanded={true}
+        >
+          <TreeItem 
+            label="Data Set" 
+            icon={<FileText className="w-4 h-4" />}
+          />
+          <TreeItem 
+            label="Model Selection" 
+            icon={<Filter className="w-4 h-4" />}
+          />
+          <TreeItem 
+            label="Forecast" 
+            icon={<ChartLine className="w-4 h-4" />}
+          />
+        </TreeItem>
       </TreeItem>
       <ProjectForm open={isFormOpen} onOpenChange={setIsFormOpen} onProjectCreate={(name) => setProjectName(name)} />
     </div>
