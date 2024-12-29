@@ -8,9 +8,10 @@ import { saveProjectConfig } from "@/utils/projectUtils"
 interface ProjectFormProps {
   open: boolean
   onOpenChange: (open: boolean) => void
+  onProjectCreate: (projectName: string) => void
 }
 
-export function ProjectForm({ open, onOpenChange }: ProjectFormProps) {
+export function ProjectForm({ open, onOpenChange, onProjectCreate }: ProjectFormProps) {
   const { toast } = useToast()
   const [formData, setFormData] = React.useState({
     projectName: "",
@@ -28,6 +29,7 @@ export function ProjectForm({ open, onOpenChange }: ProjectFormProps) {
         title: "Success",
         description: "Project configuration saved successfully"
       })
+      onProjectCreate(formData.projectName)
       onOpenChange(false)
     } catch (error) {
       toast({

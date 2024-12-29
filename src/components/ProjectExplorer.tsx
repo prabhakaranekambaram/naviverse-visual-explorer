@@ -1,6 +1,5 @@
 import { ChevronRight, ChevronDown, Folder, Upload, Database, Box, Plus, FileUp } from "lucide-react"
 import { useState, useRef } from "react"
-import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { useToast } from "@/components/ui/use-toast"
 import { ProjectForm } from "./ProjectForm"
@@ -43,6 +42,7 @@ export function ProjectExplorer() {
   const { toast } = useToast()
   const [isFormOpen, setIsFormOpen] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const [projectName, setProjectName] = useState("Project")
 
   const handleNewProject = () => {
     setIsFormOpen(true)
@@ -58,6 +58,7 @@ export function ProjectExplorer() {
 
     try {
       const config = await loadProjectConfig(file)
+      setProjectName(config.projectName)
       toast({
         title: "Success",
         description: `Project ${config.projectName} loaded successfully`
@@ -105,7 +106,7 @@ export function ProjectExplorer() {
         />
       </div>
       <TreeItem 
-        label="Project" 
+        label={projectName} 
         icon={<Folder className="w-4 h-4" />}
         defaultExpanded={true}
       >
@@ -122,7 +123,7 @@ export function ProjectExplorer() {
           icon={<Box className="w-4 h-4" />}
         />
       </TreeItem>
-      <ProjectForm open={isFormOpen} onOpenChange={setIsFormOpen} />
+      <ProjectForm open={isFormOpen} onOpenChange={setIsFormOpen} onProjectCreate={(name) => setProjectName(name)} />
     </div>
   )
 }
