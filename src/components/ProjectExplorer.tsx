@@ -1,8 +1,10 @@
 import { ChevronRight, ChevronDown, Folder, Upload, Database, Box, Plus, FileUp } from "lucide-react"
-import { useState } from "react"
+import { useState, useRef } from "react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { useToast } from "@/components/ui/use-toast"
+import { ProjectForm } from "./ProjectForm"
+import { loadProjectConfig } from "@/utils/projectUtils"
 
 interface TreeItemProps {
   label: string
@@ -39,19 +41,38 @@ const TreeItem = ({ label, icon, defaultExpanded = false, children }: TreeItemPr
 
 export function ProjectExplorer() {
   const { toast } = useToast()
+  const [isFormOpen, setIsFormOpen] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   const handleNewProject = () => {
-    toast({
-      title: "Create New Project",
-      description: "This feature is coming soon!"
-    })
+    setIsFormOpen(true)
   }
 
   const handleUploadProject = () => {
-    toast({
-      title: "Upload Project",
-      description: "This feature is coming soon!"
-    })
+    fileInputRef.current?.click()
+  }
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    try {
+      const config = await loadProjectConfig(file)
+      toast({
+        title: "Success",
+        description: `Project ${config.projectName} loaded successfully`
+      })
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to load project configuration",
+        variant: "destructive"
+      })
+    }
+    
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ''
+    }
   }
 
   return (
@@ -75,6 +96,13 @@ export function ProjectExplorer() {
           <FileUp className="w-4 h-4 mr-2" />
           Upload Project
         </Button>
+        <input
+          type="file"
+          ref={fileInputRef}
+          onChange={handleFileChange}
+          accept=".conf"
+          className="hidden"
+        />
       </div>
       <TreeItem 
         label="Project" 
@@ -94,6 +122,7 @@ export function ProjectExplorer() {
           icon={<Box className="w-4 h-4" />}
         />
       </TreeItem>
+      <ProjectForm open={isFormOpen} onOpenChange={setIsFormOpen} />
     </div>
   )
 }
