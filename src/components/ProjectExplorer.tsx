@@ -4,22 +4,38 @@ import { Button } from "@/components/ui/button"
 import { useToast } from "@/components/ui/use-toast"
 import { ProjectForm } from "./ProjectForm"
 import { loadProjectConfig } from "@/utils/projectUtils"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 
 interface TreeItemProps {
   label: string
   icon: React.ReactNode
   defaultExpanded?: boolean
   children?: React.ReactNode
+  onClick?: () => void
 }
 
-const TreeItem = ({ label, icon, defaultExpanded = false, children }: TreeItemProps) => {
+const TreeItem = ({ label, icon, defaultExpanded = false, children, onClick }: TreeItemProps) => {
   const [isExpanded, setIsExpanded] = useState(defaultExpanded)
+
+  const handleClick = () => {
+    if (onClick) {
+      onClick()
+    } else if (children) {
+      setIsExpanded(!isExpanded)
+    }
+  }
 
   return (
     <div>
       <div 
         className="tree-item"
-        onClick={() => children && setIsExpanded(!isExpanded)}
+        onClick={handleClick}
       >
         {children ? (
           isExpanded ? <ChevronDown className="tree-item-icon" /> : <ChevronRight className="tree-item-icon" />
@@ -43,6 +59,8 @@ export function ProjectExplorer() {
   const [isFormOpen, setIsFormOpen] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [projectName, setProjectName] = useState("Project")
+  const [showModelSelect, setShowModelSelect] = useState(false)
+  const [selectedModel, setSelectedModel] = useState<string>("")
 
   const handleNewProject = () => {
     setIsFormOpen(true)
@@ -74,6 +92,14 @@ export function ProjectExplorer() {
     if (fileInputRef.current) {
       fileInputRef.current.value = ''
     }
+  }
+
+  const handleModelSelect = (value: string) => {
+    setSelectedModel(value)
+    toast({
+      title: "Model Selected",
+      description: `Selected model: ${value}`
+    })
   }
 
   return (
@@ -130,7 +156,26 @@ export function ProjectExplorer() {
           <TreeItem 
             label="Model Selection" 
             icon={<Filter className="w-4 h-4" />}
-          />
+            onClick={() => setShowModelSelect(!showModelSelect)}
+          >
+            {showModelSelect && (
+              <div className="pl-8 pr-4 py-2">
+                <Select onValueChange={handleModelSelect} value={selectedModel}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a model" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="random-forest">Random Forest</SelectItem>
+                    <SelectItem value="decision-tree">Decision Tree</SelectItem>
+                    <SelectItem value="lstm">LSTM</SelectItem>
+                    <SelectItem value="ann">ANN</SelectItem>
+                    <SelectItem value="dnn">DNN</SelectItem>
+                    <SelectItem value="cnn">CNN</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+          </TreeItem>
           <TreeItem 
             label="Forecast" 
             icon={<ChartLine className="w-4 h-4" />}
