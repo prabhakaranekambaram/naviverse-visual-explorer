@@ -1,6 +1,8 @@
-import { ChevronRight, ChevronDown, Folder, Upload, Database, Box } from "lucide-react"
+import { ChevronRight, ChevronDown, Folder, Upload, Database, Box, Plus, FileUp } from "lucide-react"
 import { useState } from "react"
 import { cn } from "@/lib/utils"
+import { Button } from "@/components/ui/button"
+import { useToast } from "@/components/ui/use-toast"
 
 interface TreeItemProps {
   label: string
@@ -36,8 +38,44 @@ const TreeItem = ({ label, icon, defaultExpanded = false, children }: TreeItemPr
 }
 
 export function ProjectExplorer() {
+  const { toast } = useToast()
+
+  const handleNewProject = () => {
+    toast({
+      title: "Create New Project",
+      description: "This feature is coming soon!"
+    })
+  }
+
+  const handleUploadProject = () => {
+    toast({
+      title: "Upload Project",
+      description: "This feature is coming soon!"
+    })
+  }
+
   return (
     <div className="tree-view-container">
+      <div className="flex flex-col gap-2 mb-4">
+        <Button 
+          variant="outline" 
+          size="sm" 
+          className="w-full justify-start"
+          onClick={handleNewProject}
+        >
+          <Plus className="w-4 h-4 mr-2" />
+          New Project
+        </Button>
+        <Button 
+          variant="outline" 
+          size="sm" 
+          className="w-full justify-start"
+          onClick={handleUploadProject}
+        >
+          <FileUp className="w-4 h-4 mr-2" />
+          Upload Project
+        </Button>
+      </div>
       <TreeItem 
         label="Project" 
         icon={<Folder className="w-4 h-4" />}
