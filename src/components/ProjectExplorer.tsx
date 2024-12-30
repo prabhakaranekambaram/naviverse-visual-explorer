@@ -156,15 +156,16 @@ export function ProjectExplorer() {
           <TreeItem 
             label="Model Selection" 
             icon={<Filter className="w-4 h-4" />}
+            defaultExpanded={showModelSelect}
             onClick={() => setShowModelSelect(!showModelSelect)}
           >
             {showModelSelect && (
-              <div className="pl-8 pr-4 py-2">
+              <div className="relative pl-8 pr-4 py-2">
                 <Select onValueChange={handleModelSelect} value={selectedModel}>
-                  <SelectTrigger>
+                  <SelectTrigger className="w-full bg-background">
                     <SelectValue placeholder="Select a model" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent position="popper" className="w-full min-w-[200px]">
                     <SelectItem value="random-forest">Random Forest</SelectItem>
                     <SelectItem value="decision-tree">Decision Tree</SelectItem>
                     <SelectItem value="lstm">LSTM</SelectItem>
