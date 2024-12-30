@@ -70,10 +70,10 @@ export function Upload({ onSaveFiles }: UploadProps) {
 
   const handleSaveFile = (file: File) => {
     setSavedFiles(prev => {
-      const newSavedFiles = [...prev, file];
-      onSaveFiles?.(newSavedFiles);
-      return newSavedFiles;
-    });
+      const newSavedFiles = [...prev, file]
+      onSaveFiles?.(newSavedFiles)
+      return newSavedFiles
+    })
     setFiles(prev => prev.filter(f => f !== file))
     toast({
       title: "File Saved",
@@ -122,7 +122,7 @@ export function Upload({ onSaveFiles }: UploadProps) {
           </label>
           <input
             id="file-upload"
-            type="file"
+            type="text"
             className="hidden"
             multiple
             accept=".csv,.xlsx,.xls"

@@ -17,6 +17,8 @@ export function MainContent() {
         setCurrentView('dataViewer');
       } else if (event.detail === 'upload') {
         setCurrentView('upload');
+        // Reset files when switching back to upload view
+        setUploadedFiles([]);
       }
     };
 
