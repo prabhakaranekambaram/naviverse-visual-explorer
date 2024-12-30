@@ -6,7 +6,11 @@ import { Button } from "@/components/ui/button"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { FilePreview } from "./FilePreview"
 
-export function Upload() {
+interface UploadProps {
+  onSaveFiles?: (files: File[]) => void;
+}
+
+export function Upload({ onSaveFiles }: UploadProps) {
   const [files, setFiles] = useState<File[]>([])
   const [savedFiles, setSavedFiles] = useState<File[]>([])
   const [dragActive, setDragActive] = useState(false)
@@ -65,7 +69,11 @@ export function Upload() {
   }
 
   const handleSaveFile = (file: File) => {
-    setSavedFiles(prev => [...prev, file])
+    setSavedFiles(prev => {
+      const newSavedFiles = [...prev, file];
+      onSaveFiles?.(newSavedFiles);
+      return newSavedFiles;
+    });
     setFiles(prev => prev.filter(f => f !== file))
     toast({
       title: "File Saved",

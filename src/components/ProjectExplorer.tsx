@@ -1,5 +1,5 @@
 import { ChevronRight, ChevronDown, Folder, Upload, Database, Box, Plus, FileUp, FileText, Filter, ChartLine } from "lucide-react"
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { useToast } from "@/components/ui/use-toast"
 import { ProjectForm } from "./ProjectForm"
@@ -61,6 +61,7 @@ export function ProjectExplorer() {
   const [projectName, setProjectName] = useState("Project")
   const [showModelSelect, setShowModelSelect] = useState(false)
   const [selectedModel, setSelectedModel] = useState<string>("")
+  const [currentView, setCurrentView] = useState<'upload' | 'dataViewer'>('upload');
 
   const handleNewProject = () => {
     setIsFormOpen(true)
@@ -102,6 +103,29 @@ export function ProjectExplorer() {
     })
   }
 
+  const handleDataViewerClick = () => {
+    setCurrentView('dataViewer');
+  };
+
+  const handleUploadClick = () => {
+    setCurrentView('upload');
+  };
+
+  useEffect(() => {
+    const handleNavigation = (event: CustomEvent<string>) => {
+      if (event.detail === 'dataViewer') {
+        setCurrentView('dataViewer');
+      } else if (event.detail === 'upload') {
+        setCurrentView('upload');
+      }
+    };
+
+    window.addEventListener('navigate', handleNavigation as EventListener);
+    return () => {
+      window.removeEventListener('navigate', handleNavigation as EventListener);
+    };
+  }, []);
+
   return (
     <div className="tree-view-container">
       <div className="flex flex-col gap-2 mb-4">
@@ -139,10 +163,12 @@ export function ProjectExplorer() {
         <TreeItem 
           label="Upload" 
           icon={<Upload className="w-4 h-4" />}
+          onClick={handleUploadClick}
         />
         <TreeItem 
           label="Data Viewer" 
           icon={<Database className="w-4 h-4" />}
+          onClick={handleDataViewerClick}
         />
         <TreeItem 
           label="Model Generator" 
