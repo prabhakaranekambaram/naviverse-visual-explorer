@@ -122,7 +122,7 @@ export function Upload({ onSaveFiles }: UploadProps) {
           </label>
           <input
             id="file-upload"
-            type="text"
+            type="file"
             className="hidden"
             multiple
             accept=".csv,.xlsx,.xls"
