@@ -30,6 +30,9 @@ export default function Login() {
             appearance={{ theme: ThemeSupa }}
             providers={["google"]}
             redirectTo={window.location.origin}
+            onError={(error) => {
+              console.error('Auth error:', error);
+            }}
           />
         </div>
       </div>
