@@ -1,4 +1,4 @@
-import { Folder, Upload, Database, Box, Plus, FileUp, FileText, ChartLine, Info } from "lucide-react"
+import { Folder, Upload, Database, Box, Plus, FileUp, FileText, ChartLine, Info, DollarSign, Repeat } from "lucide-react"
 import { useState, useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { useToast } from "@/components/ui/use-toast"
@@ -114,8 +114,18 @@ export function ProjectExplorer() {
         <TreeItem 
           label="Data Viewer" 
           icon={<Database className="w-4 h-4" />}
+          defaultExpanded={true}
           onClick={() => dispatchNavigationEvent('dataViewer')}
-        />
+        >
+          <TreeItem 
+            label="Auto DCA" 
+            icon={<DollarSign className="w-4 h-4" />}
+          />
+          <TreeItem 
+            label="Auto MBAL" 
+            icon={<Repeat className="w-4 h-4" />}
+          />
+        </TreeItem>
         <TreeItem 
           label="Model Generator" 
           icon={<Box className="w-4 h-4" />}
