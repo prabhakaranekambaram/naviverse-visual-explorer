@@ -1,66 +1,18 @@
-import { ChevronRight, ChevronDown, Folder, Upload, Database, Box, Plus, FileUp, FileText, Filter, ChartLine } from "lucide-react"
-import { useState, useRef, useEffect } from "react"
+import { Folder, Upload, Database, Box, Plus, FileUp, FileText, ChartLine } from "lucide-react"
+import { useState, useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { useToast } from "@/components/ui/use-toast"
 import { ProjectForm } from "./ProjectForm"
 import { loadProjectConfig } from "@/utils/projectUtils"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-
-interface TreeItemProps {
-  label: string
-  icon: React.ReactNode
-  defaultExpanded?: boolean
-  children?: React.ReactNode
-  onClick?: () => void
-}
-
-const TreeItem = ({ label, icon, defaultExpanded = false, children, onClick }: TreeItemProps) => {
-  const [isExpanded, setIsExpanded] = useState(defaultExpanded)
-
-  const handleClick = () => {
-    if (onClick) {
-      onClick()
-    } else if (children) {
-      setIsExpanded(!isExpanded)
-    }
-  }
-
-  return (
-    <div>
-      <div 
-        className="tree-item"
-        onClick={handleClick}
-      >
-        {children ? (
-          isExpanded ? <ChevronDown className="tree-item-icon" /> : <ChevronRight className="tree-item-icon" />
-        ) : (
-          <div className="w-4" />
-        )}
-        {icon}
-        <span className="tree-item-content">{label}</span>
-      </div>
-      {children && isExpanded && (
-        <div className="tree-item-children">
-          {children}
-        </div>
-      )}
-    </div>
-  )
-}
+import { TreeItem } from "./TreeItem"
+import { ModelSelection } from "./ModelSelection"
 
 export function ProjectExplorer() {
   const { toast } = useToast()
   const [isFormOpen, setIsFormOpen] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [projectName, setProjectName] = useState("Project")
-  const [showModelSelect, setShowModelSelect] = useState(false)
-  const [selectedModel, setSelectedModel] = useState<string>("");
+  const [selectedModel, setSelectedModel] = useState<string>("")
 
   const handleNewProject = () => {
     setIsFormOpen(true)
@@ -76,7 +28,7 @@ export function ProjectExplorer() {
 
     try {
       const config = await loadProjectConfig(file)
-      setProjectName(config.projectName)
+      handleProjectChange(config.projectName)
       toast({
         title: "Success",
         description: `Project ${config.projectName} loaded successfully`
@@ -94,42 +46,16 @@ export function ProjectExplorer() {
     }
   }
 
-  const handleModelSelect = (value: string) => {
-    setSelectedModel(value)
-    toast({
-      title: "Model Selected",
-      description: `Selected model: ${value}`
-    })
+  const handleProjectChange = (name: string) => {
+    setProjectName(name)
+    const event = new CustomEvent('projectChange', { detail: name })
+    window.dispatchEvent(event)
   }
 
-  const handleDataViewerClick = () => {
-    setCurrentView('dataViewer');
-  };
-
-  const handleUploadClick = () => {
-    setCurrentView('upload');
-  };
-
-  useEffect(() => {
-    const handleNavigation = (event: CustomEvent<string>) => {
-      if (event.detail === 'dataViewer') {
-        setCurrentView('dataViewer');
-      } else if (event.detail === 'upload') {
-        setCurrentView('upload');
-      }
-    };
-
-    window.addEventListener('navigate', handleNavigation as EventListener);
-    return () => {
-      window.removeEventListener('navigate', handleNavigation as EventListener);
-    };
-  }, []);
-
-  const handleProjectChange = (name: string) => {
-    setProjectName(name);
-    const event = new CustomEvent('projectChange', { detail: name });
-    window.dispatchEvent(event);
-  };
+  const dispatchNavigationEvent = (view: string) => {
+    const event = new CustomEvent('navigate', { detail: view })
+    window.dispatchEvent(event)
+  }
 
   return (
     <div className="tree-view-container">
@@ -168,12 +94,12 @@ export function ProjectExplorer() {
         <TreeItem 
           label="Upload" 
           icon={<Upload className="w-4 h-4" />}
-          onClick={handleUploadClick}
+          onClick={() => dispatchNavigationEvent('upload')}
         />
         <TreeItem 
           label="Data Viewer" 
           icon={<Database className="w-4 h-4" />}
-          onClick={handleDataViewerClick}
+          onClick={() => dispatchNavigationEvent('dataViewer')}
         />
         <TreeItem 
           label="Model Generator" 
@@ -184,35 +110,21 @@ export function ProjectExplorer() {
             label="Data Set" 
             icon={<FileText className="w-4 h-4" />}
           />
-          <TreeItem 
-            label="Model Selection" 
-            icon={<Filter className="w-4 h-4" />}
-            defaultExpanded={true}
-            onClick={() => setShowModelSelect(!showModelSelect)}
-          >
-            <div className="relative pl-8 pr-4 py-2">
-              <Select onValueChange={handleModelSelect} value={selectedModel}>
-                <SelectTrigger className="w-full bg-background">
-                  <SelectValue placeholder="Select a model" />
-                </SelectTrigger>
-                <SelectContent position="popper" className="w-full min-w-[200px]">
-                  <SelectItem value="random-forest">Random Forest</SelectItem>
-                  <SelectItem value="decision-tree">Decision Tree</SelectItem>
-                  <SelectItem value="lstm">LSTM</SelectItem>
-                  <SelectItem value="ann">ANN</SelectItem>
-                  <SelectItem value="dnn">DNN</SelectItem>
-                  <SelectItem value="cnn">CNN</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </TreeItem>
+          <ModelSelection
+            selectedModel={selectedModel}
+            onModelSelect={setSelectedModel}
+          />
           <TreeItem 
             label="Forecast" 
             icon={<ChartLine className="w-4 h-4" />}
           />
         </TreeItem>
       </TreeItem>
-      <ProjectForm open={isFormOpen} onOpenChange={setIsFormOpen} onProjectCreate={(name) => handleProjectChange(name)} />
+      <ProjectForm 
+        open={isFormOpen} 
+        onOpenChange={setIsFormOpen} 
+        onProjectCreate={handleProjectChange} 
+      />
     </div>
   )
 }
