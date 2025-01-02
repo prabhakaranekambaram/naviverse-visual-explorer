@@ -71,7 +71,10 @@ export function Upload({ onSaveFiles }: UploadProps) {
   const handleSaveFile = (file: File) => {
     setSavedFiles(prev => {
       const newSavedFiles = [...prev, file]
-      onSaveFiles?.(newSavedFiles)
+      // Only trigger navigation when files are saved
+      if (files.length === 1) { // If this is the last file
+        onSaveFiles?.(newSavedFiles)
+      }
       return newSavedFiles
     })
     setFiles(prev => prev.filter(f => f !== file))
