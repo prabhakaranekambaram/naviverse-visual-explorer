@@ -41,6 +41,11 @@ export function FilePreview({ file, onSave, onCancel }: FilePreviewProps) {
     readFile()
   }, [file])
 
+  const handlePreprocess = () => {
+    // TODO: Implement preprocessing logic
+    console.log('Preprocessing file:', file.name)
+  }
+
   if (loading) {
     return <div className="p-4">Loading preview...</div>
   }
@@ -79,6 +84,9 @@ export function FilePreview({ file, onSave, onCancel }: FilePreviewProps) {
         <div className="flex justify-end gap-4 mt-4">
           <Button variant="outline" onClick={onCancel}>
             Cancel
+          </Button>
+          <Button variant="outline" onClick={handlePreprocess}>
+            Preprocess
           </Button>
           <Button onClick={() => onSave(file)}>
             Save
