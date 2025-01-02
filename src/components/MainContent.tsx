@@ -9,8 +9,7 @@ export function MainContent() {
 
   const handleFileSave = (files: File[]) => {
     setUploadedFiles(files);
-    // Only navigate to dataViewer when files are explicitly saved
-    setCurrentView('dataViewer');
+    // Don't automatically navigate to dataViewer anymore
   };
 
   useEffect(() => {
@@ -19,6 +18,9 @@ export function MainContent() {
         setCurrentView('upload');
         // Reset files when switching back to upload view
         setUploadedFiles([]);
+      } else if (event.detail === 'dataViewer') {
+        // Only switch to dataViewer when explicitly clicked
+        setCurrentView('dataViewer');
       }
     };
 

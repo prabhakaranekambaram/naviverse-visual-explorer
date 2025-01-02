@@ -14,6 +14,7 @@ export function ProjectExplorer() {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [projectName, setProjectName] = useState("Project")
   const [selectedModel, setSelectedModel] = useState<string>("")
+  const [highlightedItem, setHighlightedItem] = useState<string>("")
 
   const handleNewProject = () => {
     setIsFormOpen(true)
@@ -54,6 +55,7 @@ export function ProjectExplorer() {
   }
 
   const dispatchNavigationEvent = (view: string) => {
+    setHighlightedItem(view)
     const event = new CustomEvent('navigate', { detail: view })
     window.dispatchEvent(event)
   }
@@ -110,11 +112,13 @@ export function ProjectExplorer() {
           label="Upload" 
           icon={<Upload className="w-4 h-4" />}
           onClick={() => dispatchNavigationEvent('upload')}
+          isHighlighted={highlightedItem === 'upload'}
         />
         <TreeItem 
           label="Data Viewer" 
           icon={<Database className="w-4 h-4" />}
           onClick={() => dispatchNavigationEvent('dataViewer')}
+          isHighlighted={highlightedItem === 'dataViewer'}
         />
         <TreeItem 
           label="Auto DCA" 

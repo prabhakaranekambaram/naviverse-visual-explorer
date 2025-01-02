@@ -7,9 +7,17 @@ interface TreeItemProps {
   defaultExpanded?: boolean
   children?: React.ReactNode
   onClick?: () => void
+  isHighlighted?: boolean
 }
 
-export const TreeItem = ({ label, icon, defaultExpanded = false, children, onClick }: TreeItemProps) => {
+export const TreeItem = ({ 
+  label, 
+  icon, 
+  defaultExpanded = false, 
+  children, 
+  onClick,
+  isHighlighted = false 
+}: TreeItemProps) => {
   const [isExpanded, setIsExpanded] = useState(defaultExpanded)
 
   const handleClick = () => {
@@ -23,7 +31,7 @@ export const TreeItem = ({ label, icon, defaultExpanded = false, children, onCli
   return (
     <div>
       <div 
-        className="tree-item"
+        className={`tree-item ${isHighlighted ? 'bg-accent text-accent-foreground' : ''}`}
         onClick={handleClick}
       >
         {children ? (
