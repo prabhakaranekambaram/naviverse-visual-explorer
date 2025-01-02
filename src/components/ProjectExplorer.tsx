@@ -60,8 +60,7 @@ export function ProjectExplorer() {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [projectName, setProjectName] = useState("Project")
   const [showModelSelect, setShowModelSelect] = useState(false)
-  const [selectedModel, setSelectedModel] = useState<string>("")
-  const [currentView, setCurrentView] = useState<'upload' | 'dataViewer'>('upload');
+  const [selectedModel, setSelectedModel] = useState<string>("");
 
   const handleNewProject = () => {
     setIsFormOpen(true)
@@ -125,6 +124,12 @@ export function ProjectExplorer() {
       window.removeEventListener('navigate', handleNavigation as EventListener);
     };
   }, []);
+
+  const handleProjectChange = (name: string) => {
+    setProjectName(name);
+    const event = new CustomEvent('projectChange', { detail: name });
+    window.dispatchEvent(event);
+  };
 
   return (
     <div className="tree-view-container">
@@ -207,7 +212,7 @@ export function ProjectExplorer() {
           />
         </TreeItem>
       </TreeItem>
-      <ProjectForm open={isFormOpen} onOpenChange={setIsFormOpen} onProjectCreate={(name) => setProjectName(name)} />
+      <ProjectForm open={isFormOpen} onOpenChange={setIsFormOpen} onProjectCreate={(name) => handleProjectChange(name)} />
     </div>
   )
 }

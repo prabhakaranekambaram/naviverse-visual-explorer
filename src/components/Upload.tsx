@@ -8,20 +8,25 @@ import { FilePreview } from "./FilePreview"
 
 interface UploadProps {
   onSaveFiles?: (files: File[]) => void;
+  projectName: string;
 }
 
-export function Upload({ onSaveFiles }: UploadProps) {
+export function Upload({ onSaveFiles, projectName }: UploadProps) {
   const [files, setFiles] = useState<File[]>([])
   const [savedFiles, setSavedFiles] = useState<File[]>([])
   const [dragActive, setDragActive] = useState(false)
   const [uploadProgress, setUploadProgress] = useState(0)
   const { toast } = useToast()
 
+  const isDefaultProject = projectName === "Project"
+
   const onDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault()
     e.stopPropagation()
-    setDragActive(true)
-  }, [])
+    if (!isDefaultProject) {
+      setDragActive(true)
+    }
+  }, [isDefaultProject])
 
   const onDragLeave = useCallback((e: React.DragEvent) => {
     e.preventDefault()
@@ -30,6 +35,15 @@ export function Upload({ onSaveFiles }: UploadProps) {
   }, [])
 
   const validateFile = (file: File) => {
+    if (isDefaultProject) {
+      toast({
+        variant: "destructive",
+        title: "No project selected",
+        description: "Please select a project before uploading files"
+      })
+      return false
+    }
+
     const validTypes = [
       'text/csv',
       'application/vnd.ms-excel',
@@ -51,18 +65,36 @@ export function Upload({ onSaveFiles }: UploadProps) {
     e.stopPropagation()
     setDragActive(false)
 
+    if (isDefaultProject) {
+      toast({
+        variant: "destructive",
+        title: "No project selected",
+        description: "Please select a project before uploading files"
+      })
+      return
+    }
+
     const droppedFiles = Array.from(e.dataTransfer.files)
     const validFiles = droppedFiles.filter(validateFile)
     setFiles(prev => [...prev, ...validFiles])
-  }, [toast])
+  }, [toast, isDefaultProject])
 
   const onFileSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    if (isDefaultProject) {
+      toast({
+        variant: "destructive",
+        title: "No project selected",
+        description: "Please select a project before uploading files"
+      })
+      return
+    }
+
     if (e.target.files) {
       const selectedFiles = Array.from(e.target.files)
       const validFiles = selectedFiles.filter(validateFile)
       setFiles(prev => [...prev, ...validFiles])
     }
-  }, [toast])
+  }, [toast, isDefaultProject])
 
   const removeFile = (index: number) => {
     setFiles(prev => prev.filter((_, i) => i !== index))
@@ -112,16 +144,20 @@ export function Upload({ onSaveFiles }: UploadProps) {
     <div className="p-4 space-y-4">
       <div
         className={`border-2 border-dashed rounded-lg p-8 text-center ${
-          dragActive ? 'border-primary bg-primary/10' : 'border-gray-300'
+          dragActive ? 'border-primary bg-primary/10' : 
+          isDefaultProject ? 'border-gray-300 bg-gray-50 cursor-not-allowed' : 'border-gray-300'
         }`}
         onDragOver={onDragOver}
         onDragLeave={onDragLeave}
         onDrop={onDrop}
       >
-        <UploadIcon className="mx-auto h-12 w-12 text-gray-400" />
+        <UploadIcon className={`mx-auto h-12 w-12 ${isDefaultProject ? 'text-gray-300' : 'text-gray-400'}`} />
         <div className="mt-4">
-          <label htmlFor="file-upload" className="cursor-pointer text-primary hover:text-primary/80">
-            Click to upload
+          <label 
+            htmlFor="file-upload" 
+            className={`cursor-pointer ${isDefaultProject ? 'text-gray-400' : 'text-primary hover:text-primary/80'}`}
+          >
+            {isDefaultProject ? 'Select a project to upload' : 'Click to upload'}
           </label>
           <input
             id="file-upload"
@@ -130,9 +166,14 @@ export function Upload({ onSaveFiles }: UploadProps) {
             multiple
             accept=".csv,.xlsx,.xls"
             onChange={onFileSelect}
+            disabled={isDefaultProject}
           />
-          <p className="mt-1 text-sm text-gray-500">or drag and drop</p>
-          <p className="text-xs text-gray-500">CSV or Excel files</p>
+          {!isDefaultProject && (
+            <>
+              <p className="mt-1 text-sm text-gray-500">or drag and drop</p>
+              <p className="text-xs text-gray-500">CSV or Excel files</p>
+            </>
+          )}
         </div>
       </div>
 

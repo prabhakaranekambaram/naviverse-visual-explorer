@@ -5,6 +5,7 @@ import { useState, useEffect } from "react"
 export function MainContent() {
   const [currentView, setCurrentView] = useState<'upload' | 'dataViewer'>('upload');
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
+  const [projectName, setProjectName] = useState<string>("Project");
 
   const handleFileSave = (files: File[]) => {
     setUploadedFiles(files);
@@ -21,16 +22,23 @@ export function MainContent() {
       }
     };
 
+    const handleProjectChange = (event: CustomEvent<string>) => {
+      setProjectName(event.detail);
+    };
+
     window.addEventListener('navigate', handleNavigation as EventListener);
+    window.addEventListener('projectChange', handleProjectChange as EventListener);
+    
     return () => {
       window.removeEventListener('navigate', handleNavigation as EventListener);
+      window.removeEventListener('projectChange', handleProjectChange as EventListener);
     };
   }, []);
 
   return (
     <div className="flex-1 p-6">
       {currentView === 'upload' ? (
-        <Upload onSaveFiles={handleFileSave} />
+        <Upload onSaveFiles={handleFileSave} projectName={projectName} />
       ) : (
         <DataViewer files={uploadedFiles} />
       )}
