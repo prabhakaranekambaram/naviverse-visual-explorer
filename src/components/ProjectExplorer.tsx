@@ -1,4 +1,4 @@
-import { Folder, Upload, Database, Box, Plus, FileUp, FileText, ChartLine } from "lucide-react"
+import { Folder, Upload, Database, Box, Plus, FileUp, FileText, ChartLine, Info } from "lucide-react"
 import { useState, useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { useToast } from "@/components/ui/use-toast"
@@ -6,6 +6,7 @@ import { ProjectForm } from "./ProjectForm"
 import { loadProjectConfig } from "@/utils/projectUtils"
 import { TreeItem } from "./TreeItem"
 import { ModelSelection } from "./ModelSelection"
+import { Link } from "react-router-dom"
 
 export function ProjectExplorer() {
   const { toast } = useToast()
@@ -59,6 +60,20 @@ export function ProjectExplorer() {
 
   return (
     <div className="tree-view-container">
+      <div className="flex flex-col items-center gap-4 mb-6 pt-4">
+        <img 
+          src="/makar-logo.png" 
+          alt="Makar Logo" 
+          className="w-32 h-auto mb-2"
+        />
+        <Link 
+          to="/about"
+          className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 transition-colors"
+        >
+          <Info className="w-4 h-4" />
+          About
+        </Link>
+      </div>
       <div className="flex flex-col gap-2 mb-4">
         <Button 
           variant="outline" 
