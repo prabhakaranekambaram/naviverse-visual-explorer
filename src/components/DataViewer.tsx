@@ -151,7 +151,7 @@ export function DataViewer({ files }: DataViewerProps) {
                   }}
                 />
                 <ChartTooltip />
-                <ChartLegend />
+                <ChartLegend align="left" verticalAlign="top" />
                 <Line
                   type="monotone"
                   dataKey={selectedColumns.y}
