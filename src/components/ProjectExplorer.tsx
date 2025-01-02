@@ -114,18 +114,16 @@ export function ProjectExplorer() {
         <TreeItem 
           label="Data Viewer" 
           icon={<Database className="w-4 h-4" />}
-          defaultExpanded={true}
           onClick={() => dispatchNavigationEvent('dataViewer')}
-        >
-          <TreeItem 
-            label="Auto DCA" 
-            icon={<DollarSign className="w-4 h-4" />}
-          />
-          <TreeItem 
-            label="Auto MBAL" 
-            icon={<Repeat className="w-4 h-4" />}
-          />
-        </TreeItem>
+        />
+        <TreeItem 
+          label="Auto DCA" 
+          icon={<DollarSign className="w-4 h-4" />}
+        />
+        <TreeItem 
+          label="Auto MBAL" 
+          icon={<Repeat className="w-4 h-4" />}
+        />
         <TreeItem 
           label="Model Generator" 
           icon={<Box className="w-4 h-4" />}
