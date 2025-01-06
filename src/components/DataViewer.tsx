@@ -3,6 +3,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { ChartContainer, ChartTooltip, ChartLegend } from "@/components/ui/chart"
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from 'recharts';
+import { Button } from "@/components/ui/button"
+import { useToast } from "@/components/ui/use-toast"
 import * as XLSX from 'xlsx';
 
 interface DataViewerProps {
@@ -10,6 +12,7 @@ interface DataViewerProps {
 }
 
 export function DataViewer({ files }: DataViewerProps) {
+  const { toast } = useToast()
   const [selectedFile, setSelectedFile] = useState<string>('');
   const [columns, setColumns] = useState<string[]>([]);
   const [selectedColumns, setSelectedColumns] = useState<{ x: string; y: string }>({ x: '', y: '' });
@@ -68,6 +71,29 @@ export function DataViewer({ files }: DataViewerProps) {
 
     loadFileData();
   }, [selectedFile, files]);
+
+  const handlePreprocessData = () => {
+    if (data.length === 0) {
+      toast({
+        title: "No data to preprocess",
+        description: "Please ensure you have loaded data before preprocessing.",
+        variant: "destructive"
+      })
+      return;
+    }
+
+    // Log the preprocessing event for now
+    console.log('Preprocessing data:', {
+      selectedFile,
+      selectedColumns,
+      dataPoints: data.length
+    });
+
+    toast({
+      title: "Data Preprocessed",
+      description: "Your data has been preprocessed and is ready for the next stage."
+    })
+  }
 
   if (files.length === 0) {
     return (
@@ -160,6 +186,15 @@ export function DataViewer({ files }: DataViewerProps) {
                 />
               </LineChart>
             </ResponsiveContainer>
+          </div>
+
+          <div className="flex justify-end mt-4">
+            <Button 
+              onClick={handlePreprocessData}
+              className="bg-primary text-primary-foreground hover:bg-primary/90"
+            >
+              Preprocess Data
+            </Button>
           </div>
         </CardContent>
       </Card>
