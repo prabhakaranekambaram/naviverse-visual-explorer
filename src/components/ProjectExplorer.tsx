@@ -133,10 +133,6 @@ export function ProjectExplorer() {
           icon={<Box className="w-4 h-4" />}
           defaultExpanded={true}
         >
-          <TreeItem 
-            label="Data Set" 
-            icon={<FileText className="w-4 h-4" />}
-          />
           <ModelSelection
             selectedModel={selectedModel}
             onModelSelect={setSelectedModel}
