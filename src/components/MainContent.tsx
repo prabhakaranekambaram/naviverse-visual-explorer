@@ -1,25 +1,43 @@
 import { Upload } from "./Upload"
 import { DataViewer } from "./DataViewer"
 import { useState, useEffect } from "react"
+import { mergeFilesByWellName, downloadBlob } from "../utils/fileUtils"
+import { useToast } from "@/components/ui/use-toast"
 
 export function MainContent() {
+  const { toast } = useToast();
   const [currentView, setCurrentView] = useState<'upload' | 'dataViewer'>('upload');
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
   const [projectName, setProjectName] = useState<string>("Project");
 
-  const handleFileSave = (files: File[]) => {
+  const handleFileSave = async (files: File[]) => {
     setUploadedFiles(files);
-    // Don't automatically navigate to dataViewer anymore
+    
+    try {
+      // Merge files and generate download
+      const mergedBlob = await mergeFilesByWellName(files);
+      downloadBlob(mergedBlob, 'merged.xlsx');
+      
+      toast({
+        title: "Files Merged Successfully",
+        description: "The merged file has been downloaded as 'merged.xlsx'",
+      });
+    } catch (error) {
+      console.error('Error merging files:', error);
+      toast({
+        title: "Error Merging Files",
+        description: "There was an error while merging the files. Please check the file format.",
+        variant: "destructive"
+      });
+    }
   };
 
   useEffect(() => {
     const handleNavigation = (event: CustomEvent<string>) => {
       if (event.detail === 'upload') {
         setCurrentView('upload');
-        // Reset files when switching back to upload view
         setUploadedFiles([]);
       } else if (event.detail === 'dataViewer') {
-        // Only switch to dataViewer when explicitly clicked
         setCurrentView('dataViewer');
       }
     };
