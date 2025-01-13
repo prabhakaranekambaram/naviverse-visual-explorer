@@ -1,12 +1,13 @@
 import { Upload } from "./Upload"
 import { DataViewer } from "./DataViewer"
+import { CCUSScreening } from "./CCUSScreening"
 import { useState, useEffect } from "react"
 import { mergeFilesByWellName, downloadBlob } from "../utils/fileUtils"
 import { useToast } from "@/components/ui/use-toast"
 
 export function MainContent() {
   const { toast } = useToast();
-  const [currentView, setCurrentView] = useState<'upload' | 'dataViewer'>('upload');
+  const [currentView, setCurrentView] = useState<'upload' | 'dataViewer' | 'screening'>('upload');
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
   const [projectName, setProjectName] = useState<string>("Project");
 
@@ -39,6 +40,8 @@ export function MainContent() {
         setUploadedFiles([]);
       } else if (event.detail === 'dataViewer') {
         setCurrentView('dataViewer');
+      } else if (event.detail === 'screening') {
+        setCurrentView('screening');
       }
     };
 
@@ -59,8 +62,10 @@ export function MainContent() {
     <div className="flex-1 p-6">
       {currentView === 'upload' ? (
         <Upload onSaveFiles={handleFileSave} projectName={projectName} />
-      ) : (
+      ) : currentView === 'dataViewer' ? (
         <DataViewer files={uploadedFiles} />
+      ) : (
+        <CCUSScreening />
       )}
     </div>
   )

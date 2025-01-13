@@ -1,4 +1,4 @@
-import { Folder, Upload, Database, Box, Plus, FileUp, FileText, ChartLine, Info, DollarSign, Repeat } from "lucide-react"
+import { Folder, Upload, Database, Box, Plus, FileUp, FileText, ChartLine, Info, DollarSign, Repeat, CheckSquare } from "lucide-react"
 import { useState, useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { useToast } from "@/components/ui/use-toast"
@@ -65,7 +65,7 @@ export function ProjectExplorer() {
       <div className="flex flex-col items-center gap-4 mb-6 pt-4">
         <img 
           src="/makar-logo.png" 
-          alt="Makar Logo" 
+          alt="Makar.ai Logo" 
           className="w-32 h-auto mb-2"
         />
         <Link 
@@ -119,6 +119,12 @@ export function ProjectExplorer() {
           icon={<Database className="w-4 h-4" />}
           onClick={() => dispatchNavigationEvent('dataViewer')}
           isHighlighted={highlightedItem === 'dataViewer'}
+        />
+        <TreeItem 
+          label="CCUS Screening" 
+          icon={<CheckSquare className="w-4 h-4" />}
+          onClick={() => dispatchNavigationEvent('screening')}
+          isHighlighted={highlightedItem === 'screening'}
         />
         <TreeItem 
           label="Auto DCA" 
