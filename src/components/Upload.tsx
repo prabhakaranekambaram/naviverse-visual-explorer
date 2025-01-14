@@ -103,18 +103,6 @@ export function Upload({ onSaveFiles, projectName }: UploadProps) {
 
   const handleSaveFile = async (file: File) => {
     try {
-      // Check if user is authenticated
-      const { data: { session }, error: sessionError } = await supabase.auth.getSession()
-      
-      if (sessionError || !session) {
-        toast({
-          variant: "destructive",
-          title: "Authentication Error",
-          description: "Please sign in to upload files"
-        })
-        return
-      }
-
       // Create a unique file path
       const timestamp = Date.now()
       const filePath = `${projectName}/${timestamp}_${file.name}`
