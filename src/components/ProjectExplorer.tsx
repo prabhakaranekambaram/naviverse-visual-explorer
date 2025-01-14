@@ -135,16 +135,16 @@ export function ProjectExplorer() {
           />
         </TreeItem>
         <TreeItem 
-          label="Analytics" 
-          icon={<BarChart2 className="w-4 h-4" />}
-          onClick={() => dispatchNavigationEvent('analytics')}
-          isHighlighted={highlightedItem === 'analytics'}
-        />
-        <TreeItem 
           label="CCUS Screening" 
           icon={<CheckSquare className="w-4 h-4" />}
           onClick={() => dispatchNavigationEvent('screening')}
           isHighlighted={highlightedItem === 'screening'}
+        />
+        <TreeItem 
+          label="Analytics" 
+          icon={<BarChart2 className="w-4 h-4" />}
+          onClick={() => dispatchNavigationEvent('analytics')}
+          isHighlighted={highlightedItem === 'analytics'}
         />
         <TreeItem 
           label="Model Generator" 
