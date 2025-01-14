@@ -5,7 +5,6 @@ import { Progress } from "@/components/ui/progress"
 import { Button } from "@/components/ui/button"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { FilePreview } from "./FilePreview"
-import { supabase } from "@/integrations/supabase/client"
 
 interface UploadProps {
   onSaveFiles?: (files: File[]) => void;
@@ -103,38 +102,15 @@ export function Upload({ onSaveFiles, projectName }: UploadProps) {
 
   const handleSaveFile = async (file: File) => {
     try {
-      // Create a unique file path
-      const timestamp = Date.now()
-      const filePath = `${projectName}/${timestamp}_${file.name}`
-
-      // Upload to Supabase Storage
-      const { error: uploadError } = await supabase.storage
-        .from('well_data')
-        .upload(filePath, file, {
-          cacheControl: '3600',
-          upsert: false
-        })
-
-      if (uploadError) {
-        console.error('Error uploading file:', uploadError)
-        throw uploadError
-      }
-
-      // Save metadata to database
-      const { error: dbError } = await supabase
-        .from('well_data_files')
-        .insert({
-          project_name: projectName,
-          file_name: file.name,
-          file_path: filePath,
-          file_type: file.type,
-          file_size: file.size,
-        })
-
-      if (dbError) {
-        console.error('Error saving file metadata:', dbError)
-        throw dbError
-      }
+      // Save file locally
+      const url = URL.createObjectURL(file)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = file.name
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      URL.revokeObjectURL(url)
 
       setSavedFiles(prev => {
         const newSavedFiles = [...prev, file]
@@ -151,7 +127,7 @@ export function Upload({ onSaveFiles, projectName }: UploadProps) {
       console.error('Error saving file:', error)
       toast({
         title: "Error",
-        description: error.message || "Failed to save file",
+        description: "Failed to save file",
         variant: "destructive"
       })
     }
