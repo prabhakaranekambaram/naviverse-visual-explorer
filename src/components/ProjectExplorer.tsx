@@ -1,4 +1,4 @@
-import { Folder, Upload, Database, Box, Plus, FileUp, FileText, ChartLine, Info, DollarSign, Repeat, CheckSquare, BarChart2 } from "lucide-react"
+import { Folder, Upload, Database, Box, Plus, FileUp, FileText, ChartLine, Info, DollarSign, Repeat, CheckSquare, BarChart2, Settings } from "lucide-react"
 import { useState, useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { useToast } from "@/components/ui/use-toast"
@@ -109,17 +109,31 @@ export function ProjectExplorer() {
         defaultExpanded={true}
       >
         <TreeItem 
-          label="Upload" 
-          icon={<Upload className="w-4 h-4" />}
-          onClick={() => dispatchNavigationEvent('upload')}
-          isHighlighted={highlightedItem === 'upload'}
-        />
-        <TreeItem 
-          label="Data Viewer" 
-          icon={<Database className="w-4 h-4" />}
-          onClick={() => dispatchNavigationEvent('dataViewer')}
-          isHighlighted={highlightedItem === 'dataViewer'}
-        />
+          label="Well Data Management" 
+          icon={<Settings className="w-4 h-4" />}
+          defaultExpanded={true}
+        >
+          <TreeItem 
+            label="Upload" 
+            icon={<Upload className="w-4 h-4" />}
+            onClick={() => dispatchNavigationEvent('upload')}
+            isHighlighted={highlightedItem === 'upload'}
+          />
+          <TreeItem 
+            label="Data Viewer" 
+            icon={<Database className="w-4 h-4" />}
+            onClick={() => dispatchNavigationEvent('dataViewer')}
+            isHighlighted={highlightedItem === 'dataViewer'}
+          />
+          <TreeItem 
+            label="Auto DCA" 
+            icon={<DollarSign className="w-4 h-4" />}
+          />
+          <TreeItem 
+            label="Auto MBAL" 
+            icon={<Repeat className="w-4 h-4" />}
+          />
+        </TreeItem>
         <TreeItem 
           label="Analytics" 
           icon={<BarChart2 className="w-4 h-4" />}
@@ -131,14 +145,6 @@ export function ProjectExplorer() {
           icon={<CheckSquare className="w-4 h-4" />}
           onClick={() => dispatchNavigationEvent('screening')}
           isHighlighted={highlightedItem === 'screening'}
-        />
-        <TreeItem 
-          label="Auto DCA" 
-          icon={<DollarSign className="w-4 h-4" />}
-        />
-        <TreeItem 
-          label="Auto MBAL" 
-          icon={<Repeat className="w-4 h-4" />}
         />
         <TreeItem 
           label="Model Generator" 
