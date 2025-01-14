@@ -1,6 +1,5 @@
 import { ProjectExplorer } from "@/components/ProjectExplorer"
 import { MainContent } from "@/components/MainContent"
-import { RightSidebar } from "@/components/RightSidebar"
 import { UserProfile } from "@/components/UserProfile"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -92,11 +91,6 @@ const Index = () => {
               <MainContent />
             </div>
           </div>
-        </div>
-
-        {/* Right Sidebar */}
-        <div className="w-64 border-l bg-white/80 backdrop-blur-sm">
-          <RightSidebar />
         </div>
       </div>
 
