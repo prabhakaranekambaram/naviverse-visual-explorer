@@ -1,13 +1,14 @@
 import { Upload } from "./Upload"
 import { DataViewer } from "./DataViewer"
 import { CCUSScreening } from "./CCUSScreening"
+import { Analytics } from "./Analytics"
 import { useState, useEffect } from "react"
 import { mergeFilesByWellName, downloadBlob } from "../utils/fileUtils"
 import { useToast } from "@/components/ui/use-toast"
 
 export function MainContent() {
   const { toast } = useToast();
-  const [currentView, setCurrentView] = useState<'upload' | 'dataViewer' | 'screening'>('upload');
+  const [currentView, setCurrentView] = useState<'upload' | 'dataViewer' | 'screening' | 'analytics'>('upload');
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
   const [projectName, setProjectName] = useState<string>("Project");
 
@@ -15,7 +16,6 @@ export function MainContent() {
     setUploadedFiles(files);
     
     try {
-      // Merge files and generate download
       const mergedBlob = await mergeFilesByWellName(files);
       downloadBlob(mergedBlob, 'merged.xlsx');
       
@@ -42,6 +42,8 @@ export function MainContent() {
         setCurrentView('dataViewer');
       } else if (event.detail === 'screening') {
         setCurrentView('screening');
+      } else if (event.detail === 'analytics') {
+        setCurrentView('analytics');
       }
     };
 
@@ -64,6 +66,8 @@ export function MainContent() {
         <Upload onSaveFiles={handleFileSave} projectName={projectName} />
       ) : currentView === 'dataViewer' ? (
         <DataViewer files={uploadedFiles} />
+      ) : currentView === 'analytics' ? (
+        <Analytics />
       ) : (
         <CCUSScreening />
       )}

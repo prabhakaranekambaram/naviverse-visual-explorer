@@ -1,4 +1,4 @@
-import { Folder, Upload, Database, Box, Plus, FileUp, FileText, ChartLine, Info, DollarSign, Repeat, CheckSquare } from "lucide-react"
+import { Folder, Upload, Database, Box, Plus, FileUp, FileText, ChartLine, Info, DollarSign, Repeat, CheckSquare, BarChart2 } from "lucide-react"
 import { useState, useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { useToast } from "@/components/ui/use-toast"
@@ -119,6 +119,12 @@ export function ProjectExplorer() {
           icon={<Database className="w-4 h-4" />}
           onClick={() => dispatchNavigationEvent('dataViewer')}
           isHighlighted={highlightedItem === 'dataViewer'}
+        />
+        <TreeItem 
+          label="Analytics" 
+          icon={<BarChart2 className="w-4 h-4" />}
+          onClick={() => dispatchNavigationEvent('analytics')}
+          isHighlighted={highlightedItem === 'analytics'}
         />
         <TreeItem 
           label="CCUS Screening" 
