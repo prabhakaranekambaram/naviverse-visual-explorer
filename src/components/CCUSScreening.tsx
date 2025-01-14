@@ -6,6 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useToast } from "@/components/ui/use-toast"
+import { DataVisualizations } from "./DataVisualizations"
 import {
   Table,
   TableBody,
@@ -116,6 +117,7 @@ export function CCUSScreening() {
                     <Label htmlFor="permeability">Permeability (mD)</Label>
                     <Input id="permeability" type="number" placeholder="Enter permeability" />
                   </div>
+                  <DataVisualizations />
                 </div>
               )}
 
@@ -133,6 +135,7 @@ export function CCUSScreening() {
                     <Label htmlFor="carbon-price">Carbon Price (USD/tonne)</Label>
                     <Input id="carbon-price" type="number" placeholder="Enter carbon price" />
                   </div>
+                  <DataVisualizations />
                 </div>
               )}
 
@@ -146,6 +149,7 @@ export function CCUSScreening() {
                     <Label htmlFor="environmental-risk">Environmental Risk Score (1-10)</Label>
                     <Input id="environmental-risk" type="number" min="1" max="10" placeholder="Enter risk score" />
                   </div>
+                  <DataVisualizations />
                 </div>
               )}
 
@@ -177,6 +181,8 @@ export function CCUSScreening() {
                       </TableRow>
                     </TableBody>
                   </Table>
+
+                  <DataVisualizations />
 
                   <Button onClick={handleExport} className="w-full">
                     Export Screening Report
