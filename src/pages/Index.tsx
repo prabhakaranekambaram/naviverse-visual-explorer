@@ -4,6 +4,7 @@ import { UserProfile } from "@/components/UserProfile"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { ChevronRight, BarChart2, Database, FileCheck, Users } from "lucide-react"
+import MakarLogo from "@/components/MakarLogo"
 
 const Index = () => {
   return (
@@ -11,11 +12,10 @@ const Index = () => {
       {/* Top Bar */}
       <div className="w-full border-b bg-white/80 backdrop-blur-sm px-4 py-3 flex justify-between items-center">
         <div className="flex items-center gap-4">
-          <img 
-            src="/makar-logo.png" 
-            alt="Makar.ai Logo" 
-            className="h-8 w-auto"
-          />
+          <div className="flex items-center gap-2">
+            <MakarLogo className="h-8 w-8" />
+            <span className="font-bold text-primary">Makar.ai</span>
+          </div>
           <div className="hidden md:flex items-center gap-2 text-sm text-muted-foreground">
             <span>CCUS Screening Platform</span>
             <ChevronRight className="h-4 w-4" />
