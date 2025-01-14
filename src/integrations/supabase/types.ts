@@ -30,6 +30,51 @@ export type Database = {
         }
         Relationships: []
       }
+      well_data_files: {
+        Row: {
+          created_at: string
+          file_name: string
+          file_path: string
+          file_size: number
+          file_type: string
+          id: string
+          metadata: Json | null
+          processed: boolean | null
+          processing_status: string | null
+          project_name: string
+          uploaded_at: string
+          well_name: string | null
+        }
+        Insert: {
+          created_at?: string
+          file_name: string
+          file_path: string
+          file_size: number
+          file_type: string
+          id?: string
+          metadata?: Json | null
+          processed?: boolean | null
+          processing_status?: string | null
+          project_name: string
+          uploaded_at?: string
+          well_name?: string | null
+        }
+        Update: {
+          created_at?: string
+          file_name?: string
+          file_path?: string
+          file_size?: number
+          file_type?: string
+          id?: string
+          metadata?: Json | null
+          processed?: boolean | null
+          processing_status?: string | null
+          project_name?: string
+          uploaded_at?: string
+          well_name?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

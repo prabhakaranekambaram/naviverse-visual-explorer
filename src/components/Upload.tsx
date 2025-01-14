@@ -5,6 +5,7 @@ import { Progress } from "@/components/ui/progress"
 import { Button } from "@/components/ui/button"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { FilePreview } from "./FilePreview"
+import { supabase } from "@/integrations/supabase/client"
 
 interface UploadProps {
   onSaveFiles?: (files: File[]) => void;
@@ -100,20 +101,48 @@ export function Upload({ onSaveFiles, projectName }: UploadProps) {
     setFiles(prev => prev.filter((_, i) => i !== index))
   }
 
-  const handleSaveFile = (file: File) => {
-    setSavedFiles(prev => {
-      const newSavedFiles = [...prev, file]
-      // Only trigger navigation when files are saved
-      if (files.length === 1) { // If this is the last file
+  const handleSaveFile = async (file: File) => {
+    try {
+      // Upload to Supabase Storage
+      const filePath = `${projectName}/${Date.now()}_${file.name}`
+      const { error: uploadError } = await supabase.storage
+        .from('well_data')
+        .upload(filePath, file)
+
+      if (uploadError) throw uploadError
+
+      // Save metadata to database
+      const { error: dbError } = await supabase
+        .from('well_data_files')
+        .insert({
+          project_name: projectName,
+          file_name: file.name,
+          file_path: filePath,
+          file_type: file.type,
+          file_size: file.size,
+        })
+
+      if (dbError) throw dbError
+
+      setSavedFiles(prev => {
+        const newSavedFiles = [...prev, file]
         onSaveFiles?.(newSavedFiles)
-      }
-      return newSavedFiles
-    })
-    setFiles(prev => prev.filter(f => f !== file))
-    toast({
-      title: "File Saved",
-      description: `${file.name} has been saved successfully`
-    })
+        return newSavedFiles
+      })
+      setFiles(prev => prev.filter(f => f !== file))
+      
+      toast({
+        title: "File Saved",
+        description: `${file.name} has been saved successfully`
+      })
+    } catch (error) {
+      console.error('Error saving file:', error)
+      toast({
+        title: "Error",
+        description: "Failed to save file",
+        variant: "destructive"
+      })
+    }
   }
 
   const handleCancelFile = () => {
@@ -125,9 +154,8 @@ export function Upload({ onSaveFiles, projectName }: UploadProps) {
   }
 
   const uploadFiles = async () => {
-    // Simulated upload progress
-    for (let progress = 0; progress <= 100; progress += 10) {
-      setUploadProgress(progress)
+    for (let i = 0; i <= 100; i += 10) {
+      setUploadProgress(i)
       await new Promise(resolve => setTimeout(resolve, 100))
     }
     

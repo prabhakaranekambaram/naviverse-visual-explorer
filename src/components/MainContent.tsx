@@ -2,13 +2,14 @@ import { Upload } from "./Upload"
 import { DataViewer } from "./DataViewer"
 import { CCUSScreening } from "./CCUSScreening"
 import { Analytics } from "./Analytics"
+import { WellDataManager } from "./WellDataManager"
 import { useState, useEffect } from "react"
 import { mergeFilesByWellName, downloadBlob } from "../utils/fileUtils"
 import { useToast } from "@/components/ui/use-toast"
 
 export function MainContent() {
   const { toast } = useToast();
-  const [currentView, setCurrentView] = useState<'upload' | 'dataViewer' | 'screening' | 'analytics'>('upload');
+  const [currentView, setCurrentView] = useState<'upload' | 'dataViewer' | 'screening' | 'analytics' | 'wellData'>('upload');
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
   const [projectName, setProjectName] = useState<string>("Project");
 
@@ -44,6 +45,8 @@ export function MainContent() {
         setCurrentView('screening');
       } else if (event.detail === 'analytics') {
         setCurrentView('analytics');
+      } else if (event.detail === 'wellData') {
+        setCurrentView('wellData');
       }
     };
 
@@ -68,6 +71,8 @@ export function MainContent() {
         <DataViewer files={uploadedFiles} />
       ) : currentView === 'analytics' ? (
         <Analytics />
+      ) : currentView === 'wellData' ? (
+        <WellDataManager projectName={projectName} />
       ) : (
         <CCUSScreening />
       )}
