@@ -103,13 +103,34 @@ export function Upload({ onSaveFiles, projectName }: UploadProps) {
 
   const handleSaveFile = async (file: File) => {
     try {
+      // Check if user is authenticated
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+      
+      if (sessionError || !session) {
+        toast({
+          variant: "destructive",
+          title: "Authentication Error",
+          description: "Please sign in to upload files"
+        })
+        return
+      }
+
+      // Create a unique file path
+      const timestamp = Date.now()
+      const filePath = `${projectName}/${timestamp}_${file.name}`
+
       // Upload to Supabase Storage
-      const filePath = `${projectName}/${Date.now()}_${file.name}`
       const { error: uploadError } = await supabase.storage
         .from('well_data')
-        .upload(filePath, file)
+        .upload(filePath, file, {
+          cacheControl: '3600',
+          upsert: false
+        })
 
-      if (uploadError) throw uploadError
+      if (uploadError) {
+        console.error('Error uploading file:', uploadError)
+        throw uploadError
+      }
 
       // Save metadata to database
       const { error: dbError } = await supabase
@@ -122,7 +143,10 @@ export function Upload({ onSaveFiles, projectName }: UploadProps) {
           file_size: file.size,
         })
 
-      if (dbError) throw dbError
+      if (dbError) {
+        console.error('Error saving file metadata:', dbError)
+        throw dbError
+      }
 
       setSavedFiles(prev => {
         const newSavedFiles = [...prev, file]
@@ -139,7 +163,7 @@ export function Upload({ onSaveFiles, projectName }: UploadProps) {
       console.error('Error saving file:', error)
       toast({
         title: "Error",
-        description: "Failed to save file",
+        description: error.message || "Failed to save file",
         variant: "destructive"
       })
     }
@@ -227,7 +251,7 @@ export function Upload({ onSaveFiles, projectName }: UploadProps) {
               <FilePreview 
                 file={file} 
                 onSave={handleSaveFile}
-                onCancel={handleCancelFile}
+                onCancel={() => removeFile(index)}
               />
             </div>
           ))}
@@ -235,14 +259,6 @@ export function Upload({ onSaveFiles, projectName }: UploadProps) {
           {uploadProgress > 0 && (
             <Progress value={uploadProgress} className="w-full" />
           )}
-          
-          <Button
-            className="w-full"
-            onClick={uploadFiles}
-            disabled={uploadProgress > 0}
-          >
-            Upload {files.length} file{files.length > 1 ? 's' : ''}
-          </Button>
         </div>
       )}
 
