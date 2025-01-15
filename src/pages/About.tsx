@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import { ArrowLeft, CheckCircle2 } from "lucide-react"
 import { Link } from "react-router-dom"
 
@@ -11,6 +12,23 @@ const About = () => {
     "Comprehensive reporting tools",
     "Real-time collaboration features",
     "Customizable screening criteria"
+  ]
+
+  const leadership = [
+    {
+      name: "Balaji Chennakrishna",
+      role: "CEO & Co-founder",
+      bio: "Balaji brings over 15 years of experience in the energy industry, specializing in reservoir engineering and carbon capture technologies. Previously at Shell and Chevron, he led major CCUS projects and holds multiple patents in CO2 storage technologies. He earned his MS in Petroleum Engineering from Stanford University.",
+      image: "/balaji.jpg",
+      fallback: "BC"
+    },
+    {
+      name: "Prabhakaran Ekambaram",
+      role: "CTO & Co-founder",
+      bio: "Prabhakaran is a technology leader with over 20 years of experience in software development and architecture. He specializes in building scalable enterprise solutions and has led digital transformation initiatives at major energy companies. He holds an MS in Computer Science and has expertise in AI/ML applications for the energy sector.",
+      image: "/prabha.jpg",
+      fallback: "PE"
+    }
   ]
 
   return (
@@ -63,6 +81,29 @@ const About = () => {
                 </ul>
               </CardContent>
             </Card>
+          </div>
+
+          <div className="mb-12">
+            <h2 className="text-2xl font-semibold text-center mb-8">Our Leadership</h2>
+            <div className="grid md:grid-cols-2 gap-8">
+              {leadership.map((leader, index) => (
+                <Card key={index}>
+                  <CardContent className="p-6">
+                    <div className="flex items-center gap-4 mb-4">
+                      <Avatar className="h-16 w-16">
+                        <AvatarImage src={leader.image} alt={leader.name} />
+                        <AvatarFallback>{leader.fallback}</AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <h3 className="text-xl font-semibold">{leader.name}</h3>
+                        <p className="text-muted-foreground">{leader.role}</p>
+                      </div>
+                    </div>
+                    <p className="text-muted-foreground">{leader.bio}</p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
           </div>
 
           <div className="text-center">
