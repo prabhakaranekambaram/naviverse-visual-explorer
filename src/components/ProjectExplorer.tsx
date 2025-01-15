@@ -60,21 +60,7 @@ export function ProjectExplorer() {
 
   return (
     <div className="tree-view-container">
-      <div className="flex flex-col items-center gap-4 mb-6 pt-4">
-        <img 
-          src="/makar-logo.png" 
-          alt="Makar.ai Logo" 
-          className="w-32 h-auto mb-2"
-        />
-        <Link 
-          to="/about"
-          className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 transition-colors"
-        >
-          <Info className="w-4 h-4" />
-          About
-        </Link>
-      </div>
-      <div className="flex flex-col gap-2 mb-4">
+      <div className="flex flex-col gap-2 mb-4 pt-4">
         <Button 
           variant="outline" 
           size="sm" 
@@ -115,13 +101,13 @@ export function ProjectExplorer() {
             label="Upload" 
             icon={<Upload className="w-4 h-4" />}
             onClick={() => dispatchNavigationEvent('upload')}
-            isHighlightedItem={highlightedItem === 'upload'}
+            isHighlighted={highlightedItem === 'upload'}
           />
           <TreeItem 
             label="Data Viewer" 
             icon={<Database className="w-4 h-4" />}
             onClick={() => dispatchNavigationEvent('dataViewer')}
-            isHighlightedItem={highlightedItem === 'dataViewer'}
+            isHighlighted={highlightedItem === 'dataViewer'}
           />
           <TreeItem 
             label="Auto DCA" 
@@ -136,13 +122,13 @@ export function ProjectExplorer() {
           label="CCUS Screening" 
           icon={<CheckSquare className="w-4 h-4" />}
           onClick={() => dispatchNavigationEvent('screening')}
-          isHighlightedItem={highlightedItem === 'screening'}
+          isHighlighted={highlightedItem === 'screening'}
         />
         <TreeItem 
           label="Analytics" 
           icon={<BarChart2 className="w-4 h-4" />}
           onClick={() => dispatchNavigationEvent('analytics')}
-          isHighlightedItem={highlightedItem === 'analytics'}
+          isHighlighted={highlightedItem === 'analytics'}
         />
       </TreeItem>
       <ProjectForm 
