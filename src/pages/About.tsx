@@ -25,7 +25,7 @@ const About = () => {
     {
       name: "Prabhakaran Ekambaram",
       role: "CTO & Co-founder",
-      bio: "Prabhakaran is a technology leader with over 20 years of experience in software development and architecture. He specializes in building scalable enterprise solutions and has led digital transformation initiatives at major energy companies. He holds an MS in Computer Science and has expertise in AI/ML applications for the energy sector.",
+      bio: "Prabhakaran is a technology leader with over 20 years of experience in software development and architecture. He specializes in building scalable enterprise solutions and has led digital transformation initiatives at major companies. He holds an MS in Computer Science and has expertise in AI/ML applications.",
       image: "/prabha.jpg",
       fallback: "PE"
     }
