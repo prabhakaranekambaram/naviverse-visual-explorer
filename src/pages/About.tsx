@@ -18,7 +18,7 @@ const About = () => {
     {
       name: "Balaji Chennakrishna",
       role: "CEO & Co-founder",
-      bio: "Balaji brings over 15 years of experience in the energy industry, specializing in reservoir engineering and carbon capture technologies. Previously at Shell and Chevron, he led major CCUS projects and holds multiple patents in CO2 storage technologies. He earned his MS in Petroleum Engineering from Stanford University.",
+      bio: "With over 25 years of experience in the oil and gas industry, Balaji is the CEO of Telesto Energy, a Singapore based enterprise focused on bringing new technologies to the upstream sector. His expertise spans reservoir geology, production geology, field development, and geological modeling. At Telesto Energy, he leads a team leveraging AI and big data analytics to improve mature fields performance and automate decline curve analysis. He has published papers in international conferences and journals, focusing on delivering innovative solutions for the energy transition era.",
       image: "/balaji.jpg",
       fallback: "BC"
     },
