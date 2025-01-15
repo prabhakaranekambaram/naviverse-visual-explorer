@@ -3,8 +3,9 @@ import { MainContent } from "@/components/MainContent"
 import { UserProfile } from "@/components/UserProfile"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { ChevronRight, BarChart2, Database, FileCheck, Users } from "lucide-react"
+import { ChevronRight, BarChart2, Database, FileCheck, Users, Info } from "lucide-react"
 import MakarLogo from "@/components/MakarLogo"
+import { Link } from "react-router-dom"
 
 const Index = () => {
   return (
@@ -22,7 +23,16 @@ const Index = () => {
             <span>Dashboard</span>
           </div>
         </div>
-        <UserProfile />
+        <div className="flex items-center gap-4">
+          <Link 
+            to="/about"
+            className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <Info className="h-4 w-4" />
+            About
+          </Link>
+          <UserProfile />
+        </div>
       </div>
 
       {/* Main Content Area */}
