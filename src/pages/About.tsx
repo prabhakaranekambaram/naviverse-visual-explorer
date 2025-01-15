@@ -3,6 +3,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import { ArrowLeft, CheckCircle2 } from "lucide-react"
 import { Link } from "react-router-dom"
+import MakarLogo from "@/components/MakarLogo"
 
 const About = () => {
   const features = [
@@ -43,11 +44,7 @@ const About = () => {
 
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-12">
-            <img 
-              src="/makar-logo.png" 
-              alt="Makar.ai Logo" 
-              className="h-16 mx-auto mb-6"
-            />
+            <MakarLogo className="h-16 w-16 mx-auto mb-6" />
             <h1 className="text-4xl font-bold text-gray-900 mb-4">
               Simplifying CCUS Screening
             </h1>
