@@ -5,7 +5,6 @@ import { useToast } from "@/components/ui/use-toast"
 import { ProjectForm } from "./ProjectForm"
 import { loadProjectConfig } from "@/utils/projectUtils"
 import { TreeItem } from "./TreeItem"
-import { ModelSelection } from "./ModelSelection"
 import { Link } from "react-router-dom"
 
 export function ProjectExplorer() {
@@ -13,7 +12,6 @@ export function ProjectExplorer() {
   const [isFormOpen, setIsFormOpen] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [projectName, setProjectName] = useState("Project")
-  const [selectedModel, setSelectedModel] = useState<string>("")
   const [highlightedItem, setHighlightedItem] = useState<string>("")
 
   const handleNewProject = () => {
@@ -117,13 +115,13 @@ export function ProjectExplorer() {
             label="Upload" 
             icon={<Upload className="w-4 h-4" />}
             onClick={() => dispatchNavigationEvent('upload')}
-            isHighlighted={highlightedItem === 'upload'}
+            isHighlightedItem={highlightedItem === 'upload'}
           />
           <TreeItem 
             label="Data Viewer" 
             icon={<Database className="w-4 h-4" />}
             onClick={() => dispatchNavigationEvent('dataViewer')}
-            isHighlighted={highlightedItem === 'dataViewer'}
+            isHighlightedItem={highlightedItem === 'dataViewer'}
           />
           <TreeItem 
             label="Auto DCA" 
@@ -138,28 +136,14 @@ export function ProjectExplorer() {
           label="CCUS Screening" 
           icon={<CheckSquare className="w-4 h-4" />}
           onClick={() => dispatchNavigationEvent('screening')}
-          isHighlighted={highlightedItem === 'screening'}
+          isHighlightedItem={highlightedItem === 'screening'}
         />
         <TreeItem 
           label="Analytics" 
           icon={<BarChart2 className="w-4 h-4" />}
           onClick={() => dispatchNavigationEvent('analytics')}
-          isHighlighted={highlightedItem === 'analytics'}
+          isHighlightedItem={highlightedItem === 'analytics'}
         />
-        <TreeItem 
-          label="Model Generator" 
-          icon={<Box className="w-4 h-4" />}
-          defaultExpanded={true}
-        >
-          <ModelSelection
-            selectedModel={selectedModel}
-            onModelSelect={setSelectedModel}
-          />
-          <TreeItem 
-            label="Forecast" 
-            icon={<ChartLine className="w-4 h-4" />}
-          />
-        </TreeItem>
       </TreeItem>
       <ProjectForm 
         open={isFormOpen} 
