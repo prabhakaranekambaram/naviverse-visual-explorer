@@ -6,6 +6,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { ChevronRight, BarChart2, Database, FileCheck, Users, Info } from "lucide-react"
 import MakarLogo from "@/components/MakarLogo"
 import { Link } from "react-router-dom"
+import { ChatBot } from "@/components/ChatBot"
 
 const Index = () => {
   return (
@@ -110,6 +111,9 @@ const Index = () => {
           <p>© 2024 Makar.ai. All rights reserved.</p>
         </div>
       </footer>
+
+      {/* ChatBot */}
+      <ChatBot />
     </div>
   )
 }
