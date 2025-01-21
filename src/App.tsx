@@ -2,8 +2,8 @@ import { Toaster } from "@/components/ui/toaster"
 import { Toaster as Sonner } from "@/components/ui/sonner"
 import { TooltipProvider } from "@/components/ui/tooltip"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
-import { BrowserRouter, Routes, Route } from "react-router-dom"
-import { createContext, useContext, useState } from "react"
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"
+import { createContext, useContext, useState, useEffect } from "react"
 import Landing from "./pages/Landing"
 import Index from "./pages/Index"
 import Login from "./pages/Login"
@@ -12,7 +12,6 @@ import { supabase } from "./integrations/supabase/client"
 
 const queryClient = new QueryClient()
 
-// Create a context for authentication (keeping structure for future re-enablement)
 const AuthContext = createContext<{ session: any | null }>({ session: null })
 
 export const useAuth = () => {
@@ -20,7 +19,23 @@ export const useAuth = () => {
 }
 
 function App() {
-  const [session] = useState<any | null>(null)
+  const [session, setSession] = useState<any | null>(null)
+
+  useEffect(() => {
+    // Get initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session)
+    })
+
+    // Listen for auth changes
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session)
+    })
+
+    return () => subscription.unsubscribe()
+  }, [])
 
   return (
     <AuthContext.Provider value={{ session }}>
@@ -31,7 +46,10 @@ function App() {
           <BrowserRouter>
             <Routes>
               <Route path="/" element={<Landing />} />
-              <Route path="/dashboard" element={<Index />} />
+              <Route
+                path="/dashboard"
+                element={session ? <Index /> : <Navigate to="/login" />}
+              />
               <Route path="/login" element={<Login />} />
               <Route path="/about" element={<About />} />
             </Routes>
