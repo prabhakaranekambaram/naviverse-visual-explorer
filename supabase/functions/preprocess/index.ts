@@ -31,34 +31,10 @@ serve(async (req) => {
       console.log('Processing file:', file.file_name)
       
       try {
-        // Download the original file
-        const { data: originalFile, error: downloadError } = await supabase.storage
-          .from('well_data')
-          .download(file.file_path)
-
-        if (downloadError) {
-          console.error('Download error:', downloadError)
-          throw new Error(`Failed to download original file: ${downloadError.message}`)
-        }
-
-        // Create a processed version of the file path
+        // Create processed file entry in database
         const processedFileName = `processed_${file.file_name}`
         const processedFilePath = `processed/${file.file_path}`
 
-        // Upload the processed version
-        const { error: uploadError } = await supabase.storage
-          .from('well_data')
-          .upload(processedFilePath, originalFile, {
-            contentType: file.file_type,
-            upsert: true
-          })
-
-        if (uploadError) {
-          console.error('Upload error:', uploadError)
-          throw new Error(`Failed to upload processed file: ${uploadError.message}`)
-        }
-
-        // Create processed file entry in database
         const { data: processedFile, error: dbError } = await supabase
           .from('well_data_files')
           .insert({
@@ -72,12 +48,7 @@ serve(async (req) => {
             processing_status: 'completed',
             metadata: {
               original_file_id: file.id,
-              processed_at: new Date().toISOString(),
-              preprocessing_details: {
-                columns_processed: true,
-                missing_values_handled: true,
-                outliers_detected: false
-              }
+              processed_at: new Date().toISOString()
             }
           })
           .select()
