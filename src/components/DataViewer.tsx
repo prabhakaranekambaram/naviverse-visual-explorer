@@ -5,6 +5,7 @@ import { ChartContainer, ChartTooltip, ChartLegend } from "@/components/ui/chart
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from 'recharts';
 import { Button } from "@/components/ui/button"
 import { useToast } from "@/components/ui/use-toast"
+import { supabase } from "@/integrations/supabase/client"
 import * as XLSX from 'xlsx';
 
 interface DataViewerProps {
@@ -17,6 +18,7 @@ export function DataViewer({ files }: DataViewerProps) {
   const [columns, setColumns] = useState<string[]>([]);
   const [selectedColumns, setSelectedColumns] = useState<{ x: string; y: string }>({ x: '', y: '' });
   const [data, setData] = useState<any[]>([]);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   useEffect(() => {
     if (files.length > 0 && !selectedFile) {
@@ -72,7 +74,7 @@ export function DataViewer({ files }: DataViewerProps) {
     loadFileData();
   }, [selectedFile, files]);
 
-  const handlePreprocessData = () => {
+  const handlePreprocessData = async () => {
     if (data.length === 0) {
       toast({
         title: "No data to preprocess",
@@ -82,17 +84,40 @@ export function DataViewer({ files }: DataViewerProps) {
       return;
     }
 
-    // Log the preprocessing event for now
-    console.log('Preprocessing data:', {
-      selectedFile,
-      selectedColumns,
-      dataPoints: data.length
-    });
+    setIsProcessing(true);
 
-    toast({
-      title: "Data Preprocessed",
-      description: "Your data has been preprocessed and is ready for the next stage."
-    })
+    try {
+      // Get the file metadata from Supabase
+      const { data: fileData, error: fileError } = await supabase
+        .from('well_data_files')
+        .select('*')
+        .eq('file_name', selectedFile)
+        .single();
+
+      if (fileError) throw fileError;
+
+      // Call the preprocess edge function
+      const { data: preprocessResult, error } = await supabase.functions.invoke('preprocess', {
+        body: { files: [fileData] }
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Data Preprocessed",
+        description: "Your data has been preprocessed and is ready for viewing in the Well Data Manager."
+      });
+
+    } catch (error) {
+      console.error('Error preprocessing data:', error);
+      toast({
+        title: "Preprocessing Failed",
+        description: error.message || "An error occurred while preprocessing the data.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsProcessing(false);
+    }
   }
 
   if (files.length === 0) {
@@ -191,9 +216,10 @@ export function DataViewer({ files }: DataViewerProps) {
           <div className="flex justify-end mt-4">
             <Button 
               onClick={handlePreprocessData}
+              disabled={isProcessing}
               className="bg-primary text-primary-foreground hover:bg-primary/90"
             >
-              Preprocess Data
+              {isProcessing ? "Processing..." : "Preprocess Data"}
             </Button>
           </div>
         </CardContent>
