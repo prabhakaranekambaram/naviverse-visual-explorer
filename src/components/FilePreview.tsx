@@ -65,21 +65,20 @@ export function FilePreview({ file, onSave, onCancel }: FilePreviewProps) {
         body: JSON.stringify({
           files: [{
             file_name: file.name,
-            file_path: file.name // This will be updated with actual storage path after saving
+            file_path: file.name,
+            file_type: file.type,
+            file_size: file.size
           }]
         })
       })
 
       if (!response.ok) {
-        throw new Error('Failed to preprocess file')
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to preprocess file')
       }
 
       const result = await response.json()
       console.log('Preprocessing result:', result)
-
-      if (result.error) {
-        throw new Error(result.error)
-      }
 
       toast({
         title: "Success",

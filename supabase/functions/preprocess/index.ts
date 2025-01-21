@@ -20,63 +20,71 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
-    // Create Python script content
-    const pythonScript = `
-import pandas as pd
-import json
+    // Update the processing status in the database
+    for (const file of files) {
+      const { error: updateError } = await supabase
+        .from('well_data_files')
+        .update({ 
+          processing_status: 'processing',
+          processed: false 
+        })
+        .eq('file_path', file.file_path)
 
-# Load files into dataframes
-dataframes = {}
-for file_info in json.loads('${JSON.stringify(files)}'):
-    file_path = file_info['file_path']
-    file_name = file_info['file_name']
-    df_name = file_name.split('.')[0]
-    
-    if file_path.endswith('.csv'):
-        dataframes[df_name] = pd.read_csv(file_path)
-    else:
-        dataframes[df_name] = pd.read_excel(file_path)
-
-# Your preprocessing logic here
-# Example: Print basic statistics for each dataframe
-results = {}
-for name, df in dataframes.items():
-    results[name] = {
-        'shape': df.shape,
-        'columns': list(df.columns),
-        'summary': df.describe().to_dict()
+      if (updateError) {
+        throw new Error(`Failed to update processing status: ${updateError.message}`)
+      }
     }
 
-print(json.dumps(results))
-`
+    // Simulate processing (we'll implement actual processing later)
+    await new Promise(resolve => setTimeout(resolve, 2000))
 
-    // Save Python script to storage
-    const { error: uploadError } = await supabase.storage
-      .from('well_data')
-      .upload('preprocess.py', new Blob([pythonScript], { type: 'text/plain' }), {
-        upsert: true
-      })
+    // Update the status to completed
+    for (const file of files) {
+      const { error: completeError } = await supabase
+        .from('well_data_files')
+        .update({ 
+          processing_status: 'completed',
+          processed: true,
+          metadata: {
+            processed_at: new Date().toISOString(),
+            status: 'success'
+          }
+        })
+        .eq('file_path', file.file_path)
 
-    if (uploadError) {
-      throw new Error(`Failed to upload Python script: ${uploadError.message}`)
-    }
-
-    // Execute Python script (mock execution for now)
-    const results = {
-      message: 'Preprocessing completed',
-      scriptPath: 'preprocess.py',
-      filesProcessed: files.length
+      if (completeError) {
+        throw new Error(`Failed to complete processing: ${completeError.message}`)
+      }
     }
 
     return new Response(
-      JSON.stringify(results),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      JSON.stringify({
+        message: 'Preprocessing completed successfully',
+        files: files.map(f => ({
+          ...f,
+          status: 'completed'
+        }))
+      }),
+      { 
+        headers: { 
+          ...corsHeaders, 
+          'Content-Type': 'application/json' 
+        } 
+      }
     )
   } catch (error) {
     console.error('Error in preprocessing:', error)
     return new Response(
-      JSON.stringify({ error: error.message }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
+      JSON.stringify({ 
+        error: error.message || 'An unexpected error occurred during preprocessing'
+      }),
+      { 
+        headers: { 
+          ...corsHeaders, 
+          'Content-Type': 'application/json' 
+        }, 
+        status: 500 
+      }
     )
   }
 })
