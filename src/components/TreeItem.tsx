@@ -20,11 +20,16 @@ export const TreeItem = ({
 }: TreeItemProps) => {
   const [isExpanded, setIsExpanded] = useState(defaultExpanded)
 
-  const handleClick = () => {
-    if (onClick) {
-      onClick()
-    } else if (children) {
-      setIsExpanded(!isExpanded)
+  const handleClick = (e: React.MouseEvent) => {
+    const isChevronClick = (e.target as HTMLElement).closest('.tree-item-icon');
+    
+    if (isChevronClick && children) {
+      setIsExpanded(!isExpanded);
+    } else if (onClick) {
+      onClick();
+      if (children) {
+        setIsExpanded(true);
+      }
     }
   }
 

@@ -107,7 +107,6 @@ export function ProjectExplorer() {
           defaultExpanded={expandedItems.includes("Well Data Management")}
           onClick={() => {
             dispatchNavigationEvent('wellData')
-            toggleExpanded("Well Data Management")
           }}
           isHighlighted={highlightedItem === 'wellData'}
         >
