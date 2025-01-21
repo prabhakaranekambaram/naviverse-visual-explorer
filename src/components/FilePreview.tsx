@@ -2,7 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
+import { useToast } from "@/components/ui/use-toast"
 import * as XLSX from 'xlsx'
+import { supabase } from "@/integrations/supabase/client"
 
 interface FilePreviewProps {
   file: File;
@@ -14,6 +16,7 @@ export function FilePreview({ file, onSave, onCancel }: FilePreviewProps) {
   const [data, setData] = useState<any[]>([])
   const [headers, setHeaders] = useState<string[]>([])
   const [loading, setLoading] = useState(true)
+  const { toast } = useToast()
 
   useEffect(() => {
     const readFile = async () => {
@@ -33,6 +36,11 @@ export function FilePreview({ file, onSave, onCancel }: FilePreviewProps) {
         }
       } catch (error) {
         console.error('Error reading file:', error)
+        toast({
+          title: "Error",
+          description: "Failed to read file content",
+          variant: "destructive"
+        })
       } finally {
         setLoading(false)
       }
@@ -41,9 +49,41 @@ export function FilePreview({ file, onSave, onCancel }: FilePreviewProps) {
     readFile()
   }, [file])
 
-  const handlePreprocess = () => {
-    // TODO: Implement preprocessing logic
-    console.log('Preprocessing file:', file.name)
+  const handlePreprocess = async () => {
+    try {
+      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/preprocess`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`
+        },
+        body: JSON.stringify({
+          files: [{
+            file_name: file.name,
+            file_path: file.name // This will be updated with actual storage path after saving
+          }]
+        })
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to preprocess file')
+      }
+
+      const result = await response.json()
+      console.log('Preprocessing result:', result)
+
+      toast({
+        title: "Success",
+        description: "File preprocessing completed",
+      })
+    } catch (error) {
+      console.error('Error preprocessing file:', error)
+      toast({
+        title: "Error",
+        description: "Failed to preprocess file",
+        variant: "destructive"
+      })
+    }
   }
 
   if (loading) {
