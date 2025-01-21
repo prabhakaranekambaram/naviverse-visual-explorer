@@ -8,7 +8,7 @@ const corsHeaders = {
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders })
+    return new Response(null, { headers: corsHeaders })
   }
 
   try {
@@ -18,6 +18,8 @@ serve(async (req) => {
     }
 
     const { message, context } = await req.json()
+    console.log('Received message:', message)
+    console.log('Context:', context)
 
     const systemPrompt = `You are an AI assistant for a CCUS (Carbon Capture, Utilization, and Storage) project screening platform. 
     You help users understand their project data, analytics, and make informed decisions about carbon capture projects.
@@ -25,20 +27,24 @@ serve(async (req) => {
 
     console.log('Sending request to OpenAI with message:', message)
 
+    const requestBody = {
+      model: 'gpt-4o-mini',
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: message }
+      ],
+      temperature: 0.7,
+    }
+
+    console.log('Request body:', JSON.stringify(requestBody, null, 2))
+
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${openAIApiKey}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        model: 'gpt-4o-mini',
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: message }
-        ],
-        temperature: 0.7,
-      }),
+      body: JSON.stringify(requestBody),
     })
 
     if (!response.ok) {
