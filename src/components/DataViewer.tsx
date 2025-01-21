@@ -75,12 +75,12 @@ export function DataViewer({ files }: DataViewerProps) {
   }, [selectedFile, files]);
 
   const handlePreprocessData = async () => {
-    if (data.length === 0) {
+    if (!selectedFile) {
       toast({
-        title: "No data to preprocess",
-        description: "Please ensure you have loaded data before preprocessing.",
+        title: "No file selected",
+        description: "Please select a file to preprocess.",
         variant: "destructive"
-      })
+      });
       return;
     }
 
@@ -97,28 +97,32 @@ export function DataViewer({ files }: DataViewerProps) {
       if (fileError) throw fileError;
 
       // Call the preprocess edge function
-      const { data: preprocessResult, error } = await supabase.functions.invoke('preprocess', {
+      const { data: result, error } = await supabase.functions.invoke('preprocess', {
         body: { files: [fileData] }
       });
 
       if (error) throw error;
 
+      if (!result.success) {
+        throw new Error(result.error || 'Preprocessing failed');
+      }
+
       toast({
-        title: "Data Preprocessed",
-        description: "Your data has been preprocessed and is ready for viewing in the Well Data Manager."
+        title: "Success",
+        description: "File preprocessing completed successfully. Check the Well Data Manager for the processed file.",
       });
 
     } catch (error) {
       console.error('Error preprocessing data:', error);
       toast({
-        title: "Preprocessing Failed",
-        description: error.message || "An error occurred while preprocessing the data.",
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to preprocess file",
         variant: "destructive"
       });
     } finally {
       setIsProcessing(false);
     }
-  }
+  };
 
   if (files.length === 0) {
     return (

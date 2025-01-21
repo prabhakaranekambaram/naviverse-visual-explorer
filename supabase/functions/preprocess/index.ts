@@ -20,12 +20,38 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
-    // Update the processing status in the database
+    const processedFiles = []
+
+    // Process each file
     for (const file of files) {
-      // Create a new processed file entry
+      console.log('Processing file:', file.file_name)
+      
+      // Create a processed version of the file
       const processedFilePath = `processed/${file.file_path}`
       
-      const { error: dbError } = await supabase
+      // Download the original file
+      const { data: originalFile, error: downloadError } = await supabase.storage
+        .from('well_data')
+        .download(file.file_path)
+
+      if (downloadError) {
+        throw new Error(`Failed to download original file: ${downloadError.message}`)
+      }
+
+      // Upload the processed version
+      const { error: uploadError } = await supabase.storage
+        .from('well_data')
+        .upload(processedFilePath, originalFile, {
+          contentType: file.file_type,
+          upsert: true
+        })
+
+      if (uploadError) {
+        throw new Error(`Failed to upload processed file: ${uploadError.message}`)
+      }
+
+      // Create processed file entry in database
+      const { data: processedFile, error: dbError } = await supabase
         .from('well_data_files')
         .insert({
           project_name: file.project_name,
@@ -46,39 +72,21 @@ serve(async (req) => {
             }
           }
         })
+        .select()
+        .single()
 
       if (dbError) {
         throw new Error(`Failed to create processed file entry: ${dbError.message}`)
       }
 
-      // Copy the file to the processed location
-      const { data: originalFile, error: downloadError } = await supabase.storage
-        .from('well_data')
-        .download(file.file_path)
-
-      if (downloadError) {
-        throw new Error(`Failed to download original file: ${downloadError.message}`)
-      }
-
-      const { error: uploadError } = await supabase.storage
-        .from('well_data')
-        .upload(processedFilePath, originalFile, {
-          contentType: file.file_type,
-          upsert: true
-        })
-
-      if (uploadError) {
-        throw new Error(`Failed to upload processed file: ${uploadError.message}`)
-      }
+      processedFiles.push(processedFile)
     }
 
     return new Response(
       JSON.stringify({
+        success: true,
         message: 'Preprocessing completed successfully',
-        files: files.map(f => ({
-          ...f,
-          status: 'completed'
-        }))
+        data: processedFiles
       }),
       { 
         headers: { 
@@ -91,6 +99,7 @@ serve(async (req) => {
     console.error('Error in preprocessing:', error)
     return new Response(
       JSON.stringify({ 
+        success: false,
         error: error.message || 'An unexpected error occurred during preprocessing'
       }),
       { 
