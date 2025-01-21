@@ -112,7 +112,7 @@ const Index = () => {
         </div>
       </footer>
 
-      {/* ChatBot */}
+      {/* ChatBot - Make sure it's rendered outside of any scrollable containers */}
       <ChatBot />
     </div>
   )
