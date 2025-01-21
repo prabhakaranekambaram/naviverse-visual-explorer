@@ -1,3 +1,5 @@
+import { supabase } from "@/integrations/supabase/client"
+
 interface ProjectConfig {
   projectName: string
   companyName: string
@@ -7,13 +9,27 @@ interface ProjectConfig {
 }
 
 export const saveProjectConfig = async (config: ProjectConfig): Promise<void> => {
+  // Save to Supabase
+  const { error } = await supabase
+    .from('projects')
+    .insert({
+      project_name: config.projectName,
+      company_name: config.companyName,
+      block_name: config.blockName,
+      site_name: config.siteName,
+      gps_coordinates: config.gpsCoordinates
+    })
+
+  if (error) throw error
+
+  // Save as JSON file
   const configString = JSON.stringify(config, null, 2)
   const blob = new Blob([configString], { type: 'application/json' })
   const url = URL.createObjectURL(blob)
   
   const link = document.createElement('a')
   link.href = url
-  link.download = `${config.projectName.toLowerCase().replace(/\s+/g, '-')}.conf`
+  link.download = `${config.projectName.toLowerCase().replace(/\s+/g, '-')}.json`
   document.body.appendChild(link)
   link.click()
   document.body.removeChild(link)

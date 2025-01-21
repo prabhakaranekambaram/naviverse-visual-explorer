@@ -30,6 +30,39 @@ export type Database = {
         }
         Relationships: []
       }
+      projects: {
+        Row: {
+          block_name: string
+          company_name: string
+          created_at: string
+          gps_coordinates: string
+          id: string
+          project_name: string
+          site_name: string
+          updated_at: string
+        }
+        Insert: {
+          block_name: string
+          company_name: string
+          created_at?: string
+          gps_coordinates: string
+          id?: string
+          project_name: string
+          site_name: string
+          updated_at?: string
+        }
+        Update: {
+          block_name?: string
+          company_name?: string
+          created_at?: string
+          gps_coordinates?: string
+          id?: string
+          project_name?: string
+          site_name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       well_data_files: {
         Row: {
           created_at: string
