@@ -33,8 +33,16 @@ serve(async (req) => {
       try {
         // Create processed file entry in database
         const processedFileName = `processed_${file.file_name}`
-        const processedFilePath = `processed/${file.file_path}`
+        const processedFilePath = `processed/${file.project_name}/${processedFileName}`
 
+        // Copy the file to the processed location
+        const { error: storageError } = await supabase.storage
+          .from('well_data')
+          .copy(file.file_path, processedFilePath)
+
+        if (storageError) throw storageError
+
+        // Save only the processed file metadata to database
         const { data: processedFile, error: dbError } = await supabase
           .from('well_data_files')
           .insert({
@@ -47,16 +55,23 @@ serve(async (req) => {
             processed: true,
             processing_status: 'completed',
             metadata: {
-              original_file_id: file.id,
+              original_file_name: file.file_name,
               processed_at: new Date().toISOString()
             }
           })
           .select()
           .single()
 
-        if (dbError) {
-          console.error('Database error:', dbError)
-          throw new Error(`Failed to create processed file entry: ${dbError.message}`)
+        if (dbError) throw dbError
+
+        // Delete the original file from storage
+        const { error: deleteError } = await supabase.storage
+          .from('well_data')
+          .remove([file.file_path])
+
+        if (deleteError) {
+          console.error('Error deleting original file:', deleteError)
+          // Continue execution even if delete fails
         }
 
         processedFiles.push(processedFile)

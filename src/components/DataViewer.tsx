@@ -87,45 +87,36 @@ export function DataViewer({ files }: DataViewerProps) {
     setIsProcessing(true);
 
     try {
-      // Get the file metadata from Supabase
-      const { data: fileData, error: fileError } = await supabase
-        .from('well_data_files')
-        .select('*')
-        .eq('file_name', selectedFile)
-        .maybeSingle();
+      const file = files.find(f => f.name === selectedFile);
+      if (!file) throw new Error('File not found');
 
-      if (fileError) {
-        console.error('Error fetching file data:', fileError);
-        throw new Error('Failed to fetch file data');
-      }
+      // Upload file to temporary storage
+      const fileExt = file.name.split('.').pop();
+      const tempFilePath = `temp/${crypto.randomUUID()}.${fileExt}`;
+      
+      const { error: uploadError } = await supabase.storage
+        .from('well_data')
+        .upload(tempFilePath, file);
 
-      if (!fileData) {
-        throw new Error('File data not found');
-      }
+      if (uploadError) throw uploadError;
 
-      console.log('File data to preprocess:', fileData);
-
-      // Call the preprocess edge function with the complete file data
+      // Call the preprocess function with file metadata
       const { data: result, error } = await supabase.functions.invoke('preprocess', {
         body: { 
           files: [{
-            id: fileData.id,
-            project_name: fileData.project_name,
-            file_name: fileData.file_name,
-            file_path: fileData.file_path,
-            file_type: fileData.file_type,
-            file_size: fileData.file_size,
-            well_name: fileData.well_name
+            project_name: 'default', // You might want to get this from props or context
+            file_name: file.name,
+            file_path: tempFilePath,
+            file_type: file.type,
+            file_size: file.size,
+            well_name: null
           }]
         }
       });
 
       console.log('Preprocess result:', result);
 
-      if (error) {
-        console.error('Preprocess error:', error);
-        throw error;
-      }
+      if (error) throw error;
 
       if (!result.success) {
         throw new Error(result.error || 'Preprocessing failed');
@@ -143,6 +134,17 @@ export function DataViewer({ files }: DataViewerProps) {
         description: error instanceof Error ? error.message : "Failed to preprocess file",
         variant: "destructive"
       });
+
+      // Attempt to clean up temporary file if preprocessing fails
+      try {
+        const fileExt = selectedFile.split('.').pop();
+        const tempFilePath = `temp/${crypto.randomUUID()}.${fileExt}`;
+        await supabase.storage
+          .from('well_data')
+          .remove([tempFilePath]);
+      } catch (cleanupError) {
+        console.error('Error cleaning up temporary file:', cleanupError);
+      }
     } finally {
       setIsProcessing(false);
     }
