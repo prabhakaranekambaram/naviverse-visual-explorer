@@ -92,11 +92,15 @@ export function DataViewer({ files }: DataViewerProps) {
         .from('well_data_files')
         .select('*')
         .eq('file_name', selectedFile)
-        .single();
+        .maybeSingle();
 
       if (fileError) {
         console.error('Error fetching file data:', fileError);
         throw new Error('Failed to fetch file data');
+      }
+
+      if (!fileData) {
+        throw new Error('File data not found');
       }
 
       console.log('File data to preprocess:', fileData);
