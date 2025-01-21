@@ -20,8 +20,10 @@ serve(async (req) => {
     const { message, context } = await req.json()
 
     const systemPrompt = `You are an AI assistant for a CCUS (Carbon Capture, Utilization, and Storage) project screening platform. 
-    You help users understand their project data, analytics, and make informed decisions.
+    You help users understand their project data, analytics, and make informed decisions about carbon capture projects.
     Current context: ${context || 'No specific context provided'}`
+
+    console.log('Sending request to OpenAI with message:', message)
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -39,8 +41,18 @@ serve(async (req) => {
       }),
     })
 
+    if (!response.ok) {
+      const errorData = await response.json()
+      console.error('OpenAI API error:', errorData)
+      throw new Error(`OpenAI API error: ${errorData.error?.message || 'Unknown error'}`)
+    }
+
     const data = await response.json()
-    console.log('AI Response:', data)
+    console.log('OpenAI Response:', data)
+
+    if (!data.choices?.[0]?.message?.content) {
+      throw new Error('Invalid response format from OpenAI')
+    }
 
     return new Response(JSON.stringify({
       response: data.choices[0].message.content
@@ -49,7 +61,9 @@ serve(async (req) => {
     })
   } catch (error) {
     console.error('Error in chat function:', error)
-    return new Response(JSON.stringify({ error: error.message }), {
+    return new Response(JSON.stringify({ 
+      error: error.message || 'An error occurred while processing your request'
+    }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     })
