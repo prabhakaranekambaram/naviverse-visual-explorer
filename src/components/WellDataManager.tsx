@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Download, FileSpreadsheet, Trash2 } from "lucide-react"
 import { useToast } from "@/components/ui/use-toast"
 import { supabase } from "@/integrations/supabase/client"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 interface WellDataFile {
   id: string
@@ -115,9 +116,69 @@ export function WellDataManager({ projectName }: { projectName: string }) {
     }
   }
 
+  const FileTable = ({ files }: { files: WellDataFile[] }) => (
+    <div className="overflow-x-auto">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>File Name</TableHead>
+            <TableHead>Well Name</TableHead>
+            <TableHead>Type</TableHead>
+            <TableHead>Size</TableHead>
+            <TableHead>Status</TableHead>
+            <TableHead>Uploaded</TableHead>
+            <TableHead>Actions</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {files.map((file) => (
+            <TableRow key={file.id}>
+              <TableCell className="flex items-center gap-2">
+                <FileSpreadsheet className="h-4 w-4" />
+                {file.file_name}
+              </TableCell>
+              <TableCell>{file.well_name || '-'}</TableCell>
+              <TableCell>{file.file_type}</TableCell>
+              <TableCell>{(file.file_size / 1024).toFixed(2)} KB</TableCell>
+              <TableCell>
+                <Badge variant={file.processed ? "success" : "secondary"}>
+                  {file.processing_status || (file.processed ? 'Processed' : 'Pending')}
+                </Badge>
+              </TableCell>
+              <TableCell>
+                {new Date(file.uploaded_at).toLocaleDateString()}
+              </TableCell>
+              <TableCell>
+                <div className="flex gap-2">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => downloadFile(file.file_path, file.file_name)}
+                  >
+                    <Download className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => deleteFile(file.id, file.file_path)}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </div>
+  )
+
   if (loading) {
     return <div>Loading well data...</div>
   }
+
+  const originalFiles = files.filter(file => !file.processed)
+  const processedFiles = files.filter(file => file.processed)
 
   return (
     <Card>
@@ -125,66 +186,30 @@ export function WellDataManager({ projectName }: { projectName: string }) {
         <CardTitle>Well Data Files</CardTitle>
       </CardHeader>
       <CardContent>
-        {files.length === 0 ? (
-          <div className="text-center text-muted-foreground py-8">
-            No well data files found for this project
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>File Name</TableHead>
-                  <TableHead>Well Name</TableHead>
-                  <TableHead>Type</TableHead>
-                  <TableHead>Size</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Uploaded</TableHead>
-                  <TableHead>Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {files.map((file) => (
-                  <TableRow key={file.id}>
-                    <TableCell className="flex items-center gap-2">
-                      <FileSpreadsheet className="h-4 w-4" />
-                      {file.file_name}
-                    </TableCell>
-                    <TableCell>{file.well_name || '-'}</TableCell>
-                    <TableCell>{file.file_type}</TableCell>
-                    <TableCell>{(file.file_size / 1024).toFixed(2)} KB</TableCell>
-                    <TableCell>
-                      <Badge variant={file.processed ? "success" : "secondary"}>
-                        {file.processing_status || (file.processed ? 'Processed' : 'Pending')}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      {new Date(file.uploaded_at).toLocaleDateString()}
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex gap-2">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => downloadFile(file.file_path, file.file_name)}
-                        >
-                          <Download className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => deleteFile(file.id, file.file_path)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
-        )}
+        <Tabs defaultValue="original" className="w-full">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="original">Original Files ({originalFiles.length})</TabsTrigger>
+            <TabsTrigger value="processed">Processed Files ({processedFiles.length})</TabsTrigger>
+          </TabsList>
+          <TabsContent value="original">
+            {originalFiles.length === 0 ? (
+              <div className="text-center text-muted-foreground py-8">
+                No original files found
+              </div>
+            ) : (
+              <FileTable files={originalFiles} />
+            )}
+          </TabsContent>
+          <TabsContent value="processed">
+            {processedFiles.length === 0 ? (
+              <div className="text-center text-muted-foreground py-8">
+                No processed files found
+              </div>
+            ) : (
+              <FileTable files={processedFiles} />
+            )}
+          </TabsContent>
+        </Tabs>
       </CardContent>
     </Card>
   )
