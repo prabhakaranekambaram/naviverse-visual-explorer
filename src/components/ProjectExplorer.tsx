@@ -13,6 +13,7 @@ export function ProjectExplorer() {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [projectName, setProjectName] = useState("Project")
   const [highlightedItem, setHighlightedItem] = useState<string>("")
+  const [expandedItems, setExpandedItems] = useState<string[]>(["Well Data Management"])
 
   const handleNewProject = () => {
     setIsFormOpen(true)
@@ -58,6 +59,14 @@ export function ProjectExplorer() {
     window.dispatchEvent(event)
   }
 
+  const toggleExpanded = (item: string) => {
+    setExpandedItems(prev => 
+      prev.includes(item) 
+        ? prev.filter(i => i !== item)
+        : [...prev, item]
+    )
+  }
+
   return (
     <div className="tree-view-container">
       <div className="flex flex-col gap-2 mb-4 pt-4">
@@ -95,7 +104,12 @@ export function ProjectExplorer() {
         <TreeItem 
           label="Well Data Management" 
           icon={<Settings className="w-4 h-4" />}
-          defaultExpanded={true}
+          defaultExpanded={expandedItems.includes("Well Data Management")}
+          onClick={() => {
+            dispatchNavigationEvent('wellData')
+            toggleExpanded("Well Data Management")
+          }}
+          isHighlighted={highlightedItem === 'wellData'}
         >
           <TreeItem 
             label="Upload" 
