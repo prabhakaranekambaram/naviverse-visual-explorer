@@ -51,6 +51,11 @@ export function FilePreview({ file, onSave, onCancel }: FilePreviewProps) {
 
   const handlePreprocess = async () => {
     try {
+      toast({
+        title: "Processing",
+        description: "Starting file preprocessing...",
+      })
+
       const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/preprocess`, {
         method: 'POST',
         headers: {
@@ -72,15 +77,19 @@ export function FilePreview({ file, onSave, onCancel }: FilePreviewProps) {
       const result = await response.json()
       console.log('Preprocessing result:', result)
 
+      if (result.error) {
+        throw new Error(result.error)
+      }
+
       toast({
         title: "Success",
-        description: "File preprocessing completed",
+        description: "File preprocessing completed successfully",
       })
     } catch (error) {
       console.error('Error preprocessing file:', error)
       toast({
         title: "Error",
-        description: "Failed to preprocess file",
+        description: error instanceof Error ? error.message : "Failed to preprocess file",
         variant: "destructive"
       })
     }
