@@ -14,6 +14,7 @@ serve(async (req) => {
   try {
     const openAIApiKey = Deno.env.get('OPENAI_API_KEY')
     if (!openAIApiKey) {
+      console.error('Missing OpenAI API key')
       throw new Error('Missing OpenAI API key')
     }
 
@@ -28,7 +29,7 @@ serve(async (req) => {
     console.log('Sending request to OpenAI with message:', message)
 
     const requestBody = {
-      model: 'gpt-4o-mini',
+      model: 'gpt-4o',  // Changed to use the correct model name
       messages: [
         { role: 'system', content: systemPrompt },
         { role: 'user', content: message }
