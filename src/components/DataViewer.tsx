@@ -94,14 +94,34 @@ export function DataViewer({ files }: DataViewerProps) {
         .eq('file_name', selectedFile)
         .single();
 
-      if (fileError) throw fileError;
+      if (fileError) {
+        console.error('Error fetching file data:', fileError);
+        throw new Error('Failed to fetch file data');
+      }
 
-      // Call the preprocess edge function
+      console.log('File data to preprocess:', fileData);
+
+      // Call the preprocess edge function with the complete file data
       const { data: result, error } = await supabase.functions.invoke('preprocess', {
-        body: { files: [fileData] }
+        body: { 
+          files: [{
+            id: fileData.id,
+            project_name: fileData.project_name,
+            file_name: fileData.file_name,
+            file_path: fileData.file_path,
+            file_type: fileData.file_type,
+            file_size: fileData.file_size,
+            well_name: fileData.well_name
+          }]
+        }
       });
 
-      if (error) throw error;
+      console.log('Preprocess result:', result);
+
+      if (error) {
+        console.error('Preprocess error:', error);
+        throw error;
+      }
 
       if (!result.success) {
         throw new Error(result.error || 'Preprocessing failed');
@@ -109,7 +129,7 @@ export function DataViewer({ files }: DataViewerProps) {
 
       toast({
         title: "Success",
-        description: "File preprocessing completed successfully. Check the Well Data Manager for the processed file.",
+        description: "File preprocessing completed successfully.",
       });
 
     } catch (error) {
