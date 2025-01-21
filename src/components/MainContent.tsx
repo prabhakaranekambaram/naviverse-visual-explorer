@@ -4,7 +4,6 @@ import { CCUSScreening } from "./CCUSScreening"
 import { Analytics } from "./Analytics"
 import { WellDataManager } from "./WellDataManager"
 import { useState, useEffect } from "react"
-import { mergeFilesByWellName, downloadBlob } from "../utils/fileUtils"
 import { useToast } from "@/components/ui/use-toast"
 
 export function MainContent() {
@@ -13,25 +12,12 @@ export function MainContent() {
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
   const [projectName, setProjectName] = useState<string>("Project");
 
-  const handleFileSave = async (files: File[]) => {
+  const handleFileSave = (files: File[]) => {
     setUploadedFiles(files);
-    
-    try {
-      const mergedBlob = await mergeFilesByWellName(files);
-      downloadBlob(mergedBlob, 'merged.xlsx');
-      
-      toast({
-        title: "Files Merged Successfully",
-        description: "The merged file has been downloaded as 'merged.xlsx'",
-      });
-    } catch (error) {
-      console.error('Error merging files:', error);
-      toast({
-        title: "Error Merging Files",
-        description: "There was an error while merging the files. Please check the file format.",
-        variant: "destructive"
-      });
-    }
+    toast({
+      title: "Files Saved Successfully",
+      description: `${files.length} file(s) have been saved`,
+    });
   };
 
   useEffect(() => {

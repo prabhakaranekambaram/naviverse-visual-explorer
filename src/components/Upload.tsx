@@ -5,6 +5,7 @@ import { Progress } from "@/components/ui/progress"
 import { Button } from "@/components/ui/button"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { FilePreview } from "./FilePreview"
+import { supabase } from "@/integrations/supabase/client"
 
 interface UploadProps {
   onSaveFiles?: (files: File[]) => void;
@@ -102,15 +103,29 @@ export function Upload({ onSaveFiles, projectName }: UploadProps) {
 
   const handleSaveFile = async (file: File) => {
     try {
-      // Save file locally
-      const url = URL.createObjectURL(file)
-      const link = document.createElement('a')
-      link.href = url
-      link.download = file.name
-      document.body.appendChild(link)
-      link.click()
-      document.body.removeChild(link)
-      URL.revokeObjectURL(url)
+      // Upload file to Supabase storage
+      const fileExt = file.name.split('.').pop()
+      const filePath = `${projectName}/${crypto.randomUUID()}.${fileExt}`
+      
+      const { error: uploadError } = await supabase.storage
+        .from('well_data')
+        .upload(filePath, file)
+
+      if (uploadError) throw uploadError
+
+      // Save file metadata to database
+      const { error: dbError } = await supabase
+        .from('well_data_files')
+        .insert({
+          project_name: projectName,
+          file_name: file.name,
+          file_path: filePath,
+          file_type: file.type,
+          file_size: file.size,
+          processed: false
+        })
+
+      if (dbError) throw dbError
 
       setSavedFiles(prev => {
         const newSavedFiles = [...prev, file]
