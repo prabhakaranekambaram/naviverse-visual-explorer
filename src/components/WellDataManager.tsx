@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Download, FileSpreadsheet, Trash2 } from "lucide-react"
+import { Download, FileSpreadsheet, Trash2, RefreshCw } from "lucide-react"
 import { useToast } from "@/components/ui/use-toast"
 import { supabase } from "@/integrations/supabase/client"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -24,6 +24,7 @@ interface WellDataFile {
 export function WellDataManager({ projectName }: { projectName: string }) {
   const [files, setFiles] = useState<WellDataFile[]>([])
   const [loading, setLoading] = useState(true)
+  const [processingFiles, setProcessingFiles] = useState<Set<string>>(new Set())
   const { toast } = useToast()
 
   useEffect(() => {
@@ -116,6 +117,49 @@ export function WellDataManager({ projectName }: { projectName: string }) {
     }
   }
 
+  const preprocessFile = async (file: WellDataFile) => {
+    setProcessingFiles(prev => new Set(prev).add(file.id))
+    try {
+      const { data: result, error } = await supabase.functions.invoke('preprocess', {
+        body: { 
+          files: [{
+            project_name: file.project_name,
+            file_name: file.file_name,
+            file_path: file.file_path,
+            file_type: file.file_type,
+            file_size: file.file_size,
+            well_name: file.well_name
+          }]
+        }
+      })
+
+      if (error) throw error
+
+      if (!result.success) {
+        throw new Error(result.error || 'Preprocessing failed')
+      }
+
+      await fetchWellData() // Refresh the file list
+      toast({
+        title: "Success",
+        description: "File preprocessing completed successfully"
+      })
+    } catch (error) {
+      console.error('Error preprocessing file:', error)
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to preprocess file",
+        variant: "destructive"
+      })
+    } finally {
+      setProcessingFiles(prev => {
+        const newSet = new Set(prev)
+        newSet.delete(file.id)
+        return newSet
+      })
+    }
+  }
+
   const FileTable = ({ files }: { files: WellDataFile[] }) => (
     <div className="overflow-x-auto">
       <Table>
@@ -150,6 +194,16 @@ export function WellDataManager({ projectName }: { projectName: string }) {
               </TableCell>
               <TableCell>
                 <div className="flex gap-2">
+                  {!file.processed && (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => preprocessFile(file)}
+                      disabled={processingFiles.has(file.id)}
+                    >
+                      <RefreshCw className={`h-4 w-4 ${processingFiles.has(file.id) ? 'animate-spin' : ''}`} />
+                    </Button>
+                  )}
                   <Button
                     variant="ghost"
                     size="icon"
