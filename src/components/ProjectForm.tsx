@@ -4,8 +4,6 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { useToast } from "@/components/ui/use-toast"
 import { saveProjectConfig } from "@/utils/projectUtils"
-import { useAuth } from "@/App"
-import { useNavigate } from "react-router-dom"
 
 interface ProjectFormProps {
   open: boolean
@@ -15,8 +13,6 @@ interface ProjectFormProps {
 
 export function ProjectForm({ open, onOpenChange, onProjectCreate }: ProjectFormProps) {
   const { toast } = useToast()
-  const { session } = useAuth()
-  const navigate = useNavigate()
   const [formData, setFormData] = React.useState({
     projectName: "",
     companyName: "",
@@ -25,23 +21,8 @@ export function ProjectForm({ open, onOpenChange, onProjectCreate }: ProjectForm
     gpsCoordinates: ""
   })
 
-  React.useEffect(() => {
-    if (!session) {
-      navigate('/login')
-    }
-  }, [session, navigate])
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!session) {
-      toast({
-        title: "Error",
-        description: "You must be logged in to create a project",
-        variant: "destructive"
-      })
-      navigate('/login')
-      return
-    }
     
     try {
       await saveProjectConfig(formData)
